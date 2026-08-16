@@ -86,7 +86,7 @@ func get_import_options(preset):
 		},
 		{
 			"name": "embed_internal_images",
-			"default_value": true if preset == PRESET_PIXEL_ART else false
+			"default_value": true
 		},
 		{
 			"name": "save_tiled_properties",
