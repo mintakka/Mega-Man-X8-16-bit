@@ -23,7 +23,7 @@ func set_windowsize(multiplier):
 	Configurations.set(w_size,current_multiplier)
 	display_value(current_multiplier)
 	if not Configurations.get("Fullscreen"):
-		OS.set_window_size(GameManager.get_native_size() * current_multiplier)
+		OS.set_window_size(GameManager.get_window_native_size() * current_multiplier)
 	pass
 
 func get_windowsize():
