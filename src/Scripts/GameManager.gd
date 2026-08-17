@@ -706,8 +706,8 @@ const armor_slots := ["head", "body", "arms", "legs"]
 const armor_sets := ["normal", "icarus", "hermes"]
 var cheat_armor := {"head": "normal", "body": "normal", "arms": "normal", "legs": "normal"}
 
-func cycle_cheat_armor(slot : String) -> void:
-	var next : int = (armor_sets.find(cheat_armor[slot]) + 1) % armor_sets.size()
+func cycle_cheat_armor(slot : String, direction := 1) -> void:
+	var next : int = wrapi(armor_sets.find(cheat_armor[slot]) + direction, 0, armor_sets.size())
 	cheat_armor[slot] = armor_sets[next]
 	used_cheats = true
 	apply_cheat_armor()
