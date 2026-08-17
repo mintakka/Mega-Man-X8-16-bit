@@ -7,11 +7,22 @@ extends Control
 #   the pause menu (Pause.gd gates Start on player.has_control()).
 const TOGGLE_KEY := KEY_K
 
+const color_on := Color(0.4, 1.0, 0.45, 1.0)
+const color_off := Color(0.42, 0.47, 0.58, 1.0)
+const color_icarus := Color(0.45, 0.82, 1.0, 1.0)
+const color_hermes := Color(1.0, 0.66, 0.27, 1.0)
+
 onready var panel: Control = $Panel
-onready var god_mode_label: Label = $Panel/VBoxContainer/god_mode
-onready var infinite_ammo_label: Label = $Panel/VBoxContainer/infinite_ammo
-onready var infinite_health_label: Label = $Panel/VBoxContainer/infinite_health
-onready var infinite_lives_label: Label = $Panel/VBoxContainer/infinite_lives
+onready var god_mode_value: Label = $Panel/Border/VBox/god_mode/value
+onready var infinite_ammo_value: Label = $Panel/Border/VBox/infinite_ammo/value
+onready var infinite_health_value: Label = $Panel/Border/VBox/infinite_health/value
+onready var infinite_lives_value: Label = $Panel/Border/VBox/infinite_lives/value
+onready var armor_values := {
+	"head": $Panel/Border/VBox/armor_head/value,
+	"body": $Panel/Border/VBox/armor_body/value,
+	"arms": $Panel/Border/VBox/armor_arms/value,
+	"legs": $Panel/Border/VBox/armor_legs/value,
+}
 
 func _ready() -> void:
 	panel.visible = false
@@ -35,15 +46,36 @@ func _input(event: InputEvent) -> void:
 			GameManager.set_cheat_infinite_health(not GameManager.cheat_infinite_health)
 		KEY_4:
 			GameManager.set_cheat_infinite_lives(not GameManager.cheat_infinite_lives)
+		KEY_5:
+			GameManager.cycle_cheat_armor("head")
+		KEY_6:
+			GameManager.cycle_cheat_armor("body")
+		KEY_7:
+			GameManager.cycle_cheat_armor("arms")
+		KEY_8:
+			GameManager.cycle_cheat_armor("legs")
 		_:
 			return
 	refresh()
 
 func refresh() -> void:
-	god_mode_label.text = "1 God Mode: " + on_off(GameManager.cheat_god_mode)
-	infinite_ammo_label.text = "2 Inf. Ammo: " + on_off(GameManager.cheat_infinite_ammo)
-	infinite_health_label.text = "3 Inf. Health: " + on_off(GameManager.cheat_infinite_health)
-	infinite_lives_label.text = "4 Inf. Lives: " + on_off(GameManager.cheat_infinite_lives)
+	display(god_mode_value, GameManager.cheat_god_mode)
+	display(infinite_ammo_value, GameManager.cheat_infinite_ammo)
+	display(infinite_health_value, GameManager.cheat_infinite_health)
+	display(infinite_lives_value, GameManager.cheat_infinite_lives)
+	for slot in armor_values.keys():
+		display_armor(armor_values[slot], GameManager.cheat_armor[slot])
 
-func on_off(value : bool) -> String:
-	return "ON" if value else "OFF"
+func display(label : Label, value : bool) -> void:
+	label.text = "ON" if value else "OFF"
+	label.add_color_override("font_color", color_on if value else color_off)
+
+func display_armor(label : Label, set_name : String) -> void:
+	label.text = set_name.to_upper()
+	match set_name:
+		"icarus":
+			label.add_color_override("font_color", color_icarus)
+		"hermes":
+			label.add_color_override("font_color", color_hermes)
+		_:
+			label.add_color_override("font_color", color_off)

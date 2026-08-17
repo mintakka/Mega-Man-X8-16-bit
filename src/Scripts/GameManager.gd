@@ -642,10 +642,49 @@ func apply_cheats_to_player() -> void:
 		player.add_invulnerability(cheat_invulnerability_source)
 	else:
 		player.remove_invulnerability(cheat_invulnerability_source)
-	var buster := player.get_node_or_null("Shot")
-	if buster:
-		buster.infinite_regular_ammo = cheat_infinite_ammo
-		buster.infinite_charged_ammo = cheat_infinite_ammo
+	apply_ammo_cheat()
+	call_deferred("apply_cheat_armor")
+
+#Turning the ammo cheat off must not clobber what the equipped arms already
+#grant: Icarus arms give infinite charged shots, Hermes arms infinite regular
+#ones. Restore from whichever buster is active instead of blanking both.
+func apply_ammo_cheat() -> void:
+	var buster = player.get_node_or_null("Shot")
+	if not buster:
+		return
+	if cheat_infinite_ammo:
+		buster.infinite_regular_ammo = true
+		buster.infinite_charged_ammo = true
+		return
+	var icarus = buster.get_node_or_null("Icarus Buster")
+	var hermes = buster.get_node_or_null("Hermes Buster")
+	buster.infinite_regular_ammo = hermes != null and hermes.active
+	buster.infinite_charged_ammo = icarus != null and icarus.active
+
+#Armor cheat: pick a set per slot. Parts are equipped by calling equip_parts()
+#directly rather than emitting "collected", because that signal also runs
+#Player.collect() -> add_collectible_to_savedata(), which would write the parts
+#into the save file. This keeps the whole cheat session-only.
+#Note the game has no un-equip path (there are no equip_no_*_parts functions),
+#so clearing a slot back to "normal" only takes effect on the next level load.
+const armor_slots := ["head", "body", "arms", "legs"]
+const armor_sets := ["normal", "icarus", "hermes"]
+var cheat_armor := {"head": "normal", "body": "normal", "arms": "normal", "legs": "normal"}
+
+func cycle_cheat_armor(slot : String) -> void:
+	var next : int = (armor_sets.find(cheat_armor[slot]) + 1) % armor_sets.size()
+	cheat_armor[slot] = armor_sets[next]
+	used_cheats = true
+	apply_cheat_armor()
+
+func apply_cheat_armor() -> void:
+	if not is_player_in_scene():
+		return
+	for slot in armor_slots:
+		var set_name : String = cheat_armor[slot]
+		if set_name != "normal":
+			player.equip_parts(set_name + "_" + slot)
+	player.finished_equipping()
 
 var weapon_got : = "none"
 var current_armor : Array
