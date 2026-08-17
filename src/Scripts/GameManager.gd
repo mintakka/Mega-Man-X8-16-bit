@@ -64,7 +64,42 @@ func _ready() -> void:
 	Input.connect("joy_connection_changed",self,"on_joy_connection_changed") # warning-ignore:return_value_discarded
 	BossRNG.initialize()
 	Savefile.load_save()
+	apply_aspect_ratio()
 	on_level_start()
+
+#Render resolution. The game is authored for a 398x224 (16:9) canvas. The 16:10
+#option keeps the width and adds vertical view (398x249) instead of cropping the
+#sides, so nothing on screen shrinks - you simply see more above and below.
+#StateCamera clamps against this height, and it already centres the view in
+#camera zones shorter than the screen, so tight vertical rooms stay in bounds.
+const view_width := 398
+const view_height_16_9 := 224
+const view_height_16_10 := 249
+const aspect_config_key := "Widescreen"
+var view_height : int = view_height_16_9
+
+func get_native_size() -> Vector2:
+	return Vector2(view_width, view_height)
+
+func is_widescreen() -> bool:
+	return Configurations.get(aspect_config_key) == true
+
+func apply_aspect_ratio() -> void:
+	view_height = view_height_16_10 if is_widescreen() else view_height_16_9
+	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_2D, SceneTree.STRETCH_ASPECT_KEEP, get_native_size())
+	update_window_size()
+	print("GameManager: aspect ratio set to " + get_aspect_name() + " " + str(get_native_size()))
+
+func get_aspect_name() -> String:
+	return "16:10" if is_widescreen() else "16:9"
+
+func update_window_size() -> void:
+	if Configurations.get("Fullscreen"):
+		return
+	var multiplier = Configurations.get("WindowSize")
+	if not multiplier:
+		multiplier = 3
+	OS.set_window_size(get_native_size() * multiplier)
 
 #Godot 3.5's bundled controller database has no entry for the Handheld Daemon /
 #Legion Go emulated pad (045e:028f), so it falls back to raw evdev button order,
