@@ -60,9 +60,36 @@ var lumine_boss_order : Array
 func _ready() -> void:
 	print ("GameManager: Initializing...")
 	set_pause_mode(2)
+	fix_unmapped_joypads()
+	Input.connect("joy_connection_changed",self,"on_joy_connection_changed") # warning-ignore:return_value_discarded
 	BossRNG.initialize()
 	Savefile.load_save()
 	on_level_start()
+
+#Godot 3.5's bundled controller database has no entry for the Handheld Daemon /
+#Legion Go emulated pad (045e:028f), so it falls back to raw evdev button order,
+#where Select/Start report as 6/7 instead of JOY_SELECT(10)/JOY_START(11).
+#That leaves Start and Select dead in game. Register the standard xpad mapping
+#for that device only, so every other controller is left untouched.
+const unmapped_joypad_guids := ["5e0400008f02"]
+const xpad_mapping_body := ",a:b0,b:b1,back:b6,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b8,leftshoulder:b4,leftstick:b9,lefttrigger:a2,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b10,righttrigger:a5,rightx:a3,righty:a4,start:b7,x:b2,y:b3,platform:Linux,"
+
+func on_joy_connection_changed(device : int, connected : bool) -> void:
+	if connected:
+		fix_unmapped_joypad(device)
+
+func fix_unmapped_joypads() -> void:
+	for device in Input.get_connected_joypads():
+		fix_unmapped_joypad(device)
+
+func fix_unmapped_joypad(device : int) -> void:
+	var guid : String = Input.get_joy_guid(device)
+	for fragment in unmapped_joypad_guids:
+		if fragment in guid:
+			var joy_name : String = Input.get_joy_name(device).replace(",","")
+			Input.add_joy_mapping(guid + "," + joy_name + xpad_mapping_body, true)
+			print("GameManager: registered missing controller mapping for " + joy_name + " (" + guid + ")")
+			return
 
 
 func start_dialog(dialog_tree) -> void:
@@ -195,7 +222,7 @@ func finished_fade_out() -> void:
 			#go_to_intro()
 
 		#check if still has lives and reduce
-		elif GlobalVariables.get(player_life_count) > 0:
+		elif GlobalVariables.get(player_life_count) > 0 or cheat_infinite_lives:
 			handle_player_death() #reduce life count
 			call_deferred("restart_level")
 
@@ -229,6 +256,9 @@ func go_to_credits():
 	pass
 
 func handle_player_death() -> void:
+	if cheat_infinite_lives:
+		print_debug("Player died, infinite lives cheat active, not reducing lives")
+		return
 	var lives = GlobalVariables.get(player_life_count)
 	print_debug("Player died, current lives: " + str(lives) + " being reduced by 1")
 	GlobalVariables.set(player_life_count, lives -1)
@@ -291,6 +321,7 @@ func set_player(object):
 	player.active = false
 	player.visible = false
 	player.deactivate()
+	apply_cheats_to_player()
 
 func add_collectibles_to_player():
 	if player:
@@ -349,7 +380,9 @@ func _physics_process(delta: float) -> void:
 		OS.window_fullscreen = !OS.window_fullscreen
 		Configurations.set("Fullscreen",OS.window_fullscreen)
 		Savefile.save()
-	
+	if cheat_infinite_health and player and is_instance_valid(player) and player.has_health():
+		player.current_health = player.max_health
+
 
 func handle_end_of_level(delta: float) -> void:
 	if end_stage_timer > 0:
@@ -572,6 +605,47 @@ func is_cheating() -> bool:
 	if OS.has_feature("editor"):
 		return false
 	return used_cheats
+
+#Player Cheats
+var cheat_god_mode := false
+var cheat_infinite_ammo := false
+var cheat_infinite_health := false
+var cheat_infinite_lives := false
+const cheat_invulnerability_source := "cheat_god_mode"
+
+func set_cheat_god_mode(value : bool) -> void:
+	cheat_god_mode = value
+	if value:
+		used_cheats = true
+	apply_cheats_to_player()
+
+func set_cheat_infinite_ammo(value : bool) -> void:
+	cheat_infinite_ammo = value
+	if value:
+		used_cheats = true
+	apply_cheats_to_player()
+
+func set_cheat_infinite_health(value : bool) -> void:
+	cheat_infinite_health = value
+	if value:
+		used_cheats = true
+
+func set_cheat_infinite_lives(value : bool) -> void:
+	cheat_infinite_lives = value
+	if value:
+		used_cheats = true
+
+func apply_cheats_to_player() -> void:
+	if not player or not is_instance_valid(player):
+		return
+	if cheat_god_mode:
+		player.add_invulnerability(cheat_invulnerability_source)
+	else:
+		player.remove_invulnerability(cheat_invulnerability_source)
+	var buster := player.get_node_or_null("Shot")
+	if buster:
+		buster.infinite_regular_ammo = cheat_infinite_ammo
+		buster.infinite_charged_ammo = cheat_infinite_ammo
 
 var weapon_got : = "none"
 var current_armor : Array
