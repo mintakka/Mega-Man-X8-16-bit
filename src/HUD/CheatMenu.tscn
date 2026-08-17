@@ -269,5 +269,5 @@ custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_offset_x = 1
 custom_constants/shadow_offset_y = 1
 custom_fonts/font = ExtResource( 2 )
-text = "DPAD/A  -  K CLOSE"
+text = "DPAD/A  L3/K CLOSE"
 align = 1

@@ -1,10 +1,16 @@
 extends Control
 
-# Opened with a hardcoded key that is NOT in the InputMap, so it cannot collide
-# with gameplay actions or the key rebinding menu. Once open it navigates with
-# the game's own UI actions, so it works on a controller d-pad without needing
-# any extra bindings.
+# Opened with a hardcoded key or joypad button, neither of which is in the
+# InputMap, so they cannot collide with gameplay actions or the key rebinding
+# menu. Once open it navigates with the game's own UI actions, so it works on a
+# controller d-pad without needing any extra bindings.
+#
+# L3 (left stick click) is the joypad toggle because it is the only button the
+# game leaves unbound: every other index is taken, including R3 by reset_weapon
+# and SELECT by debug. It matters on Android, which has no keyboard for K and no
+# touch controls at all, so a joypad is the only way in there.
 const TOGGLE_KEY := KEY_K
+const TOGGLE_JOY_BUTTON := JOY_L3
 const PAUSE_SOURCE := "CheatMenu"
 
 const color_title := Color(1.0, 0.913725, 0.0, 1.0)
@@ -35,7 +41,7 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if not visible:
 		return
-	if event is InputEventKey and event.pressed and not event.echo and event.scancode == TOGGLE_KEY:
+	if is_toggle_event(event):
 		toggle_menu()
 		return
 	if not open:
@@ -53,6 +59,16 @@ func _input(event: InputEvent) -> void:
 		activate(selected, -1)
 	elif event.is_action_pressed("ui_cancel"):
 		close_menu()
+
+#Checked on both the keyboard and the joypad event so the menu opens the same way
+#on desktop and on Android. Guarded on pressed so the release event does not
+#immediately toggle it back shut.
+func is_toggle_event(event : InputEvent) -> bool:
+	if event is InputEventKey:
+		return event.pressed and not event.echo and event.scancode == TOGGLE_KEY
+	if event is InputEventJoypadButton:
+		return event.pressed and event.button_index == TOGGLE_JOY_BUTTON
+	return false
 
 func toggle_menu() -> void:
 	if open:
