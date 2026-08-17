@@ -2,7 +2,6 @@ extends Camera2D
 class_name StateCamera
 
 const width := 398
-const height := 224
 onready var coll: CollisionShape2D = $area_limit_detector/collisionShape2D
 
 var modes = []
@@ -282,9 +281,9 @@ func get_nearest_position(pos = null) -> Vector2: #gets nearest CAMERA position
 	elif is_over_right_limit(pos):
 		pos.x = custom_limits_right - float(width)/2
 	if is_over_top_limit(pos):
-		pos.y = custom_limits_top + float(height)/2
+		pos.y = custom_limits_top + view_height()/2
 	elif is_over_bottom_limit(pos):
-		pos.y = custom_limits_bot - float(height)/2
+		pos.y = custom_limits_bot - view_height()/2
 	return pos
 
 func get_nearest_position_inside_camera (pos = null) -> Vector2: #Use this one for Objects
@@ -326,25 +325,30 @@ func is_constrained_horizontally() -> bool:
 func is_constrained_vertically() -> bool:
 	if ignore_limits:
 		return false
-	return custom_limits_bot - custom_limits_top <= height
+	return custom_limits_bot - custom_limits_top <= view_height()
+
+#Vertical view size follows the aspect ratio option: 224 for 16:9, 249 for
+#16:10. Read it live from GameManager so switching applies without a reload.
+func view_height() -> float:
+	return float(GameManager.view_height)
 
 func get_raw_left_limit(pos) -> float:
 	return pos.x - float(width)/2 
 func get_raw_right_limit(pos) -> float:
 	return pos.x + float(width)/2 
 func get_raw_top_limit(pos) -> float:
-	return pos.y - float(height)/2
+	return pos.y - view_height()/2
 func get_raw_bottom_limit(pos) -> float:
-	return pos.y + float(height)/2
+	return pos.y + view_height()/2
 
 func get_boundary_position_left() -> float:
 	return custom_limits_left + float(width)/2 
 func get_boundary_position_right() -> float:
 	return custom_limits_right - float(width)/2 
 func get_boundary_position_top() -> float:
-	return custom_limits_top + float(height)/2 
+	return custom_limits_top + view_height()/2 
 func get_boundary_position_bot() -> float:
-	return custom_limits_bot - float(height)/2 
+	return custom_limits_bot - view_height()/2 
 
 func debug_information() -> void:
 	if GlobalVariables.get("ShowDebug"):

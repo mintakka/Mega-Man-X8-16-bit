@@ -1,6 +1,6 @@
 extends X8OptionButton
 
-const native = Vector2(398, 224)
+#Native canvas size depends on the aspect ratio option (16:9 or 16:10).
 const w_size := "WindowSize"
 var current_multiplier = 1
 
@@ -23,7 +23,7 @@ func set_windowsize(multiplier):
 	Configurations.set(w_size,current_multiplier)
 	display_value(current_multiplier)
 	if not Configurations.get("Fullscreen"):
-		OS.set_window_size(native * current_multiplier)
+		OS.set_window_size(GameManager.get_window_native_size() * current_multiplier)
 	pass
 
 func get_windowsize():

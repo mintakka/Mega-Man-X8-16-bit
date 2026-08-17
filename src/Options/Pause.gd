@@ -31,6 +31,14 @@ func _ready() -> void:
 	options_menu.connect("end",self,"unlock_buttons") # warning-ignore:return_value_discarded
 	achievements.connect("end",self,"unlock_buttons") # warning-ignore:return_value_discarded
 	Event.connect("lumine_desperation",self,"on_lumine_desperation")
+	Event.connect("aspect_ratio_changed",self,"update_aspect_offset") # warning-ignore:return_value_discarded
+	update_aspect_offset()
+
+#This menu is authored for the 398x224 canvas but overlays gameplay, which uses
+#the taller canvas at 16:10. Shift the whole layer so it stays centred instead
+#of sitting against the top edge.
+func update_aspect_offset() -> void:
+	offset.y = (GameManager.view_height - GameManager.view_height_16_9) / 2.0
 	
 func on_lumine_desperation():
 	endgame = true

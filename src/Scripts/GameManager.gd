@@ -64,7 +64,74 @@ func _ready() -> void:
 	Input.connect("joy_connection_changed",self,"on_joy_connection_changed") # warning-ignore:return_value_discarded
 	BossRNG.initialize()
 	Savefile.load_save()
+	apply_aspect_ratio()
 	on_level_start()
+
+#Render resolution. The game is authored for a 398x224 (16:9) canvas. The 16:10
+#option keeps the width and adds vertical view (398x249) instead of cropping the
+#sides, so nothing on screen shrinks - you simply see more above and below.
+#StateCamera clamps against this height, and it already centres the view in
+#camera zones shorter than the screen, so tight vertical rooms stay in bounds.
+const view_width := 398
+const view_height_16_9 := 224
+const view_height_16_10 := 249
+const aspect_config_key := "Widescreen"
+var view_height : int = view_height_16_9
+
+func get_native_size() -> Vector2:
+	return Vector2(view_width, view_height)
+
+func is_widescreen() -> bool:
+	return Configurations.get(aspect_config_key) == true
+
+func get_aspect_name() -> String:
+	return "16:10" if is_widescreen() else "16:9"
+
+func configured_view_height() -> int:
+	return view_height_16_10 if is_widescreen() else view_height_16_9
+
+#Only gameplay gets the taller canvas. Every menu screen (title, stage select,
+#armor setup, key config, weapon get...) pins its contents with fixed margins
+#inside a 398x224 layout and is full of hardcoded 224 offsets, so at 249 they
+#stay pinned to the top and leave a strip of clear colour at the bottom.
+#Rendering menus at their authored height letterboxes them cleanly instead.
+func target_view_height() -> int:
+	if is_widescreen() and is_in_gameplay_scene():
+		return view_height_16_10
+	return view_height_16_9
+
+#Keyed off the scene rather than the player, so the canvas does not flip back
+#and forth while the player is being freed and respawned on death.
+func is_in_gameplay_scene() -> bool:
+	var scene = get_tree().current_scene
+	if not scene:
+		return false
+	return scene.filename.begins_with("res://src/Levels/")
+
+func apply_aspect_ratio() -> void:
+	set_canvas_height(target_view_height())
+	update_window_size()
+
+func set_canvas_height(new_height : int) -> void:
+	if view_height == new_height:
+		return
+	view_height = new_height
+	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_2D, SceneTree.STRETCH_ASPECT_KEEP, get_native_size())
+	Event.emit_signal("aspect_ratio_changed")
+	print("GameManager: canvas set to " + str(get_native_size()) + " (" + get_aspect_name() + " selected)")
+
+#The window keeps the configured aspect at all times, so entering and leaving a
+#stage never resizes it - menus simply letterbox inside it.
+func get_window_native_size() -> Vector2:
+	return Vector2(view_width, configured_view_height())
+
+func update_window_size() -> void:
+	if Configurations.get("Fullscreen"):
+		return
+	var multiplier = Configurations.get("WindowSize")
+	if not multiplier:
+		multiplier = 3
+	OS.set_window_size(get_window_native_size() * multiplier)
 
 #Godot 3.5's bundled controller database has no entry for the Handheld Daemon /
 #Legion Go emulated pad (045e:028f), so it falls back to raw evdev button order,
@@ -382,6 +449,8 @@ func _physics_process(delta: float) -> void:
 		Savefile.save()
 	if cheat_infinite_health and player and is_instance_valid(player) and player.has_health():
 		player.current_health = player.max_health
+	#Follow scene changes: taller canvas in stages, authored canvas in menus.
+	set_canvas_height(target_view_height())
 
 
 func handle_end_of_level(delta: float) -> void:
@@ -671,8 +740,8 @@ const armor_slots := ["head", "body", "arms", "legs"]
 const armor_sets := ["normal", "icarus", "hermes"]
 var cheat_armor := {"head": "normal", "body": "normal", "arms": "normal", "legs": "normal"}
 
-func cycle_cheat_armor(slot : String) -> void:
-	var next : int = (armor_sets.find(cheat_armor[slot]) + 1) % armor_sets.size()
+func cycle_cheat_armor(slot : String, direction := 1) -> void:
+	var next : int = wrapi(armor_sets.find(cheat_armor[slot]) + direction, 0, armor_sets.size())
 	cheat_armor[slot] = armor_sets[next]
 	used_cheats = true
 	apply_cheat_armor()

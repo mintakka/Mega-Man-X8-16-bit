@@ -225,3 +225,4 @@ signal lumine_desperation
 signal beat_seraph_lumine
 signal final_fade_out
 
+signal aspect_ratio_changed
