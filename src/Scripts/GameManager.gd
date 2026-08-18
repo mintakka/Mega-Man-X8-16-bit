@@ -721,8 +721,8 @@ func is_cheating() -> bool:
 #The in-game cheat menu stays locked until the code is entered on the options
 #screen. This is deliberately per-boot rather than saved: the game is meant to
 #start honest every launch, so the code is re-entered to re-enable cheats.
-const cheat_code_length := 6
-const cheat_unlock_code := "082404"
+const cheat_code_length := 4
+const cheat_unlock_code := "4736"
 var cheats_unlocked := false
 
 #Returns whether the code was right. A wrong code never re-locks an already

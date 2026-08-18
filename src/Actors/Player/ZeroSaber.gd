@@ -80,6 +80,19 @@ const COMBO := ["atk1", "atk2", "atk3"]
 const COMBO_INPUT_STEP := 0
 const COMBO_SWAP_STEP := 8
 
+# How long after a swing ends the chain still counts as running. GML drops the
+# chain the moment the swing finishes, which works there because its recovery is
+# short; here it meant every press restarted at atk_1 and all three slashes
+# looked identical. Holding the position for a moment is what makes mashing read
+# as one-two-three.
+const COMBO_GRACE := 0.35
+
+# Ground slashes are cancelled by leaving the floor, but is_on_floor() flickers
+# for a frame on slopes and moving platforms. Cancelling on a single false
+# reading ended the swing almost immediately, which is why only the first frames
+# of atk_1 were ever visible.
+const AIRBORNE_FRAMES_TO_CANCEL := 4
+
 export var saber_sound_light : AudioStream
 export var saber_sound_heavy : AudioStream
 export var saber_sound_ryuenjin : AudioStream
@@ -92,6 +105,11 @@ var attack := ""
 var steps := 0
 var queued_next := false
 var ending := false
+var airborne_steps := 0
+# Where the ground chain got to, kept alive briefly after the swing ends so the
+# next press continues it instead of starting over.
+var combo_index := -1
+var combo_grace := 0.0
 var targets := []
 # Target -> the step it was last damaged on, so a sustained blade re-hits on the
 # attack's own interval instead of once per frame.
@@ -121,7 +139,7 @@ func select_attack() -> String:
 			return "ryuenjin"
 		if character.is_executing("Dash"):
 			return "shippuuga"
-		return "atk1"
+		return COMBO[next_combo_index()]
 	if character.is_executing("WallSlide"):
 		return "wall"
 	if holding("move_down"):
@@ -134,8 +152,22 @@ func select_attack() -> String:
 		return "raikousen"
 	return "jump"
 
+#The next link in the ground chain: the one after whatever last landed if the
+#grace window is still open, otherwise back to the first slash.
+func next_combo_index() -> int:
+	if combo_grace > 0.0 and combo_index >= 0 and combo_index + 1 < COMBO.size():
+		return combo_index + 1
+	return 0
+
+func _process(delta : float) -> void:
+	if combo_grace > 0.0 and not executing:
+		combo_grace -= delta
+		if combo_grace <= 0.0:
+			combo_index = -1
+
 func _Setup() -> void:
 	ending = false
+	airborne_steps = 0
 	begin_attack(select_attack())
 
 func begin_attack(new_attack : String) -> void:
@@ -146,6 +178,8 @@ func begin_attack(new_attack : String) -> void:
 	last_hit_step.clear()
 	set_hitbox_enabled(false)
 	var data : Dictionary = ATTACKS[attack]
+	combo_index = COMBO.find(attack)
+	combo_grace = COMBO_GRACE
 	character.play_animation(data.animation)
 	#Committing to a facing at the start stops the slash from being steered
 	#mid-swing, which would let the hitbox swap sides under the animation.
@@ -268,8 +302,13 @@ func _EndCondition() -> bool:
 	if data.has("dive"):
 		return character.is_on_floor()
 	#Leaving the floor cancels a grounded slash, matching the GML cancel check.
-	if data.ground and not character.is_on_floor() and steps > 0:
-		return true
+	if data.ground and steps > 0:
+		if character.is_on_floor():
+			airborne_steps = 0
+		else:
+			airborne_steps += 1
+			if airborne_steps >= AIRBORNE_FRAMES_TO_CANCEL:
+				return true
 	return steps >= animation_length(data.animation)
 
 func animation_length(anim : String) -> int:

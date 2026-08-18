@@ -13,10 +13,12 @@ const AXL := "axl"
 
 const DEFAULT := X
 
+#Every character uses the one player scene; it reconfigures itself in place for
+#whoever was picked, so there is no per-character scene to point at.
 const scenes := {
 	X: "res://src/Actors/Player.tscn",
-	ZERO: "res://src/Actors/Player_Zero.tscn",
-	AXL: "res://src/Actors/Player_Axl.tscn",
+	ZERO: "res://src/Actors/Player.tscn",
+	AXL: "res://src/Actors/Player.tscn",
 }
 
 # Idle animations for the select screen. These are the same SpriteFrames the
@@ -68,8 +70,11 @@ static func resolve_for_stage(stage_name : String, picked : String) -> String:
 		return DEFAULT
 	return picked
 
-# A character scene is only usable once it has actually been created; Zero and
-# Axl are added incrementally, so this keeps the select screen honest about
-# which entries are real rather than offering a stage that cannot load.
+# A character is only playable once their sprites exist, since that is what the
+# player scene morphs itself with. Keeps the select screen honest about which
+# entries are real rather than offering a stage that cannot load.
 static func is_implemented(id : String) -> bool:
-	return exists(id) and ResourceLoader.exists(get_scene_path(id))
+	if id == X:
+		return true
+	var frames := get_select_frames(id)
+	return frames != "" and ResourceLoader.exists(frames)

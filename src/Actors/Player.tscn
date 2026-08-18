@@ -1,7 +1,14 @@
-[gd_scene load_steps=132 format=2]
+[gd_scene load_steps=139 format=2]
 
 [ext_resource path="res://src/Actors/Player/x_sprites/x.res" type="SpriteFrames" id=1]
 [ext_resource path="res://src/Actors/Player.gd" type="Script" id=2]
+[ext_resource path="res://src/Actors/Player/ZeroSaber.gd" type="Script" id=120]
+[ext_resource path="res://src/Actors/IcarusHeadArea.gd" type="Script" id=121]
+[ext_resource path="res://src/Actors/Player/zero_sprites/zero.tres" type="SpriteFrames" id=122]
+[ext_resource path="res://src/Sounds/zero_saber_1.wav" type="AudioStream" id=123]
+[ext_resource path="res://src/Sounds/zero_saber_2.wav" type="AudioStream" id=124]
+[ext_resource path="res://src/Sounds/zero_saber_ryuenjin.wav" type="AudioStream" id=125]
+[ext_resource path="res://src/Sounds/zero_saber_hyouretsuzan.wav" type="AudioStream" id=126]
 [ext_resource path="res://src/Sounds/JUMP.wav" type="AudioStream" id=3]
 [ext_resource path="res://Jump.gd" type="Script" id=4]
 [ext_resource path="res://Dash.gd" type="Script" id=5]
@@ -177,6 +184,9 @@ particles_animation = true
 particles_anim_h_frames = 2
 particles_anim_v_frames = 2
 particles_anim_loop = false
+
+[sub_resource type="RectangleShape2D" id=60]
+extents = Vector2( 14, 12 )
 
 [node name="X" type="KinematicBody2D" groups=["Player"]]
 z_index = 2
@@ -1119,3 +1129,29 @@ text = "x"
 [connection signal="ability_start" from="Forced" to="Shot/DriftDiamond" method="_on_Forced_ability_start"]
 [connection signal="activated" from="Shot/XDrive" to="animatedSprite/afterImages" method="activate"]
 [connection signal="deactivated" from="Shot/XDrive" to="animatedSprite/afterImages" method="deactivate"]
+
+[node name="Saber" type="Node2D" parent="."]
+script = ExtResource( 120 )
+active = false
+conflicting_moves = [ "Death", "WeaponStasis", "Damage", "Ride" ]
+actions = [ "fire" ]
+saber_sound_light = ExtResource( 123 )
+saber_sound_heavy = ExtResource( 124 )
+saber_sound_ryuenjin = ExtResource( 125 )
+saber_sound_hyouretsuzan = ExtResource( 126 )
+
+[node name="audioStreamPlayer" type="AudioStreamPlayer2D" parent="Saber"]
+volume_db = -6.0
+max_distance = 600.0
+bus = "SFX"
+
+[node name="SaberArea" type="RigidBody2D" parent="Saber" groups=["Player Projectile"]]
+visible = false
+collision_layer = 4
+collision_mask = 0
+mode = 3
+script = ExtResource( 121 )
+
+[node name="collisionShape2D" type="CollisionShape2D" parent="Saber/SaberArea"]
+shape = SubResource( 60 )
+disabled = true

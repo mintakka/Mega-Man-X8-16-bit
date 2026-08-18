@@ -102,8 +102,8 @@ func increase_hitbox():
 	
 
 func _ready() -> void:
-	if allow_character_swap and swap_to_active_character():
-		return
+	if allow_character_swap:
+		configure_for_character(GameManager.active_character)
 	current_armor = ["no_head", "no_body", "no_arms", "no_legs"]
 	Event.listen("collected", self, "equip_parts")
 	Event.listen("collected", self, "collect")
@@ -408,49 +408,62 @@ func stop_forced_movement(forcer = null):
 		grabbed = false
 
 
-#Replaces this X instance with the character the player took into the stage.
-#Returns true when a swap happened, in which case the caller must stop setting
-#itself up - this node is on its way out and must never reach
-#GameManager.set_player, or the freed X would be registered as the live player.
-func swap_to_active_character() -> bool:
-	var id : String = GameManager.active_character
-	if id == CharacterRoster.X or not CharacterRoster.is_implemented(id):
-		return false
+#Levels embed this scene directly, so rather than replacing the node with a
+#different one it is reconfigured in place. An earlier version did swap nodes and
+#had to defer the add_child, because a level is still instancing its children
+#when this runs and Godot refuses add_child on a busy parent. That left one frame
+#with no registered player, which crashed any level whose props read
+#GameManager.player in their own _ready - Booster Forest's ride armour does
+#exactly that. Configuring in place keeps the node, its name, its transform and
+#its material, and keeps GameManager.set_player on the same frame it always was.
+func configure_for_character(id : String) -> void:
+	if id == CharacterRoster.ZERO:
+		become_zero()
 
-	var scene = load(CharacterRoster.get_scene_path(id))
-	if scene == null:
-		Log("Could not load character scene for " + id + ", staying as X")
-		return false
+func become_zero() -> void:
+	var frames = load(CharacterRoster.get_select_frames(CharacterRoster.ZERO))
+	if frames == null:
+		Log("Zero sprites missing, staying as X")
+		return
 
-	var replacement = scene.instance()
-	replacement.transform = transform
-	#Levels override the sprite material for their own lighting (the dark
-	#sections of Inferno and Pitch Black), so carry it across or the swapped-in
-	#character ignores the level's lighting.
-	var sprite = get_node_or_null("animatedSprite")
-	var new_sprite = replacement.get_node_or_null("animatedSprite")
-	if sprite and new_sprite and sprite.material:
-		new_sprite.material = sprite.material
+	animatedSprite.frames = frames
+	animatedSprite.position.y = -7
+	animatedSprite.animation = "idle"
+	animatedSprite.frame = 0
 
-	var slot := get_index()
-	var host := get_parent()
+	#X's armour beam intro drives beam/beam_in/beam_equip and its own VFX, none of
+	#which suit a character with no armour.
+	skip_intro = true
 
-	#A level is still instancing its own children when this runs, and Godot
-	#refuses add_child on a parent that is "busy setting up children" - it fails
-	#with an error rather than an exception, which previously left the stage with
-	#no player at all: this X had already renamed itself and queued its own free,
-	#and the replacement never arrived. Everything that touches the tree is
-	#therefore deferred, and deferred calls run in the order they are queued, so
-	#the child is added before it is moved into place.
-	#
-	#The name is handed over first, while still synchronous, because a node
-	#cannot take a name a sibling still holds - the replacement would silently
-	#become "X2" and every NodePath aimed at the player would miss.
-	var kept_name := name
-	name = kept_name + "_replaced"
-	replacement.name = kept_name
+	#Shot and AltFire both swap SpriteFrames wholesale through
+	#set_animation_layer, so both sets on both nodes have to be Zero's or firing
+	#turns him back into X and breaks every animation that follows. He has no
+	#separate arm layer, so the swap is then inert.
+	for node_name in ["Shot", "AltFire"]:
+		var shooter = get_node_or_null(node_name)
+		if shooter:
+			shooter.normal_sprites = frames
+			shooter.arm_pointing_sprites = frames
 
-	host.call_deferred("add_child", replacement)
-	host.call_deferred("move_child", replacement, slot)
-	call_deferred("queue_free")
-	return true
+	#Zero's buster moves to alt_fire because the saber owns fire. AltFire is
+	#already bound to alt_fire for X's special weapons, and Zero has none in the
+	#source engine, so it is switched off rather than left to fight Shot for the
+	#same button - that fight was what put X's arm sprites on Zero.
+	var shot = get_node_or_null("Shot")
+	if shot:
+		shot.actions = ["alt_fire"]
+	var alt_fire = get_node_or_null("AltFire")
+	if alt_fire:
+		alt_fire.active = false
+
+	var saber = get_node_or_null("Saber")
+	if saber:
+		saber.active = true
+
+	#Zero has no charge shot in the source engine (charge_unlocked is false).
+	var charge = get_node_or_null("Charge")
+	if charge:
+		charge.active = false
+
+	for part in get_armor_sprites():
+		part.visible = false
