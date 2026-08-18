@@ -1,0 +1,23 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/zero_saber_2.wav-bfa40de962b3e09552708e9662179abf.sample"
+
+[deps]
+
+source_file="res://src/Sounds/zero_saber_2.wav"
+dest_files=[ "res://.import/zero_saber_2.wav-bfa40de962b3e09552708e9662179abf.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

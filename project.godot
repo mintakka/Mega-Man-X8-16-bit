@@ -829,6 +829,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://src/Effects/Player Death.gd"
 }, {
+"base": "Movement",
+"class": "ZeroSaber",
+"language": "GDScript",
+"path": "res://src/Actors/Player/ZeroSaber.gd"
+}, {
 "base": "CameraMode",
 "class": "ZoneTranslateCameraMode",
 "language": "GDScript",
@@ -1004,6 +1009,7 @@ _global_script_class_icons={
 "X8OptionButton": "",
 "X8TextureButton": "",
 "XDeathParticle": "",
+"ZeroSaber": "",
 "ZoneTranslateCameraMode": "",
 "passarin_area": ""
 }

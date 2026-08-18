@@ -15,7 +15,8 @@ spr_zero_crouch,spr_zero_dolor2,spr_zero_atk_1,spr_zero_atk_2,spr_zero_atk_3,\
 spr_zero_atk_jump,spr_zero_atk_land,spr_zero_atk_wall,spr_zero_intro,\
 spr_zero_teleport,spr_zero_outro,spr_zero_atk_ryuenjin,\
 spr_zero_atk_hyouretsuzan,spr_zero_atk_raikousen,spr_zero_atk_raikousen_air,\
-spr_zero_atk_shippuuga,spr_zero_messenko"
+spr_zero_atk_shippuuga,spr_zero_messenko,spr_zero_atk_mikazukizan,\
+spr_zero_buster"
 
 # Godot-facing name = GML name, so Zero answers to the animation names the
 # existing ability nodes already drive.
@@ -23,14 +24,14 @@ spr_zero_atk_shippuuga,spr_zero_messenko"
 # armour-beam animations. Zero has no armour, so they map onto his own
 # teleport-in and intro poses and the intro plays through unchanged.
 ALIAS="damage=dolor2,slide=wall_slide,walljump=wall_jump,\
-beam=teleport,beam_in=intro,beam_equip=intro"
+beam=teleport,beam_in=intro,beam_equip=intro,shot=buster"
 
 ANIMS="idle,walk,jump,fall,land,dash,dash_end,slide,walljump,crouch,crouch_end,\
 damage,intro,teleport,outro,atk_1,atk_1_end,atk_2,atk_2_end,atk_3,atk_3_end,\
 atk_jump,atk_jump_end,atk_land,atk_land_end,atk_wall,atk_wall_end,\
 atk_ryuenjin,atk_ryuenjin_end,atk_hyouretsuzan,atk_hyouretsuzan_end,\
 atk_raikousen,atk_raikousen_air,atk_shippuuga,atk_shippuuga_end,messenko,\
-beam,beam_in,beam_equip"
+beam,beam_in,beam_equip,atk_mikazukizan,shot"
 
 mkdir -p "$OUT"
 

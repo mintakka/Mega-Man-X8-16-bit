@@ -1,7 +1,16 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://src/Actors/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://src/Actors/Player/zero_sprites/zero.tres" type="SpriteFrames" id=2]
+[ext_resource path="res://src/Actors/Player/ZeroSaber.gd" type="Script" id=3]
+[ext_resource path="res://src/Actors/IcarusHeadArea.gd" type="Script" id=4]
+[ext_resource path="res://src/Sounds/zero_saber_1.wav" type="AudioStream" id=5]
+[ext_resource path="res://src/Sounds/zero_saber_2.wav" type="AudioStream" id=6]
+[ext_resource path="res://src/Sounds/zero_saber_ryuenjin.wav" type="AudioStream" id=7]
+[ext_resource path="res://src/Sounds/zero_saber_hyouretsuzan.wav" type="AudioStream" id=8]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 14, 12 )
 
 [node name="Zero" instance=ExtResource( 1 )]
 allow_character_swap = false
@@ -27,5 +36,33 @@ visible = false
 [node name="legs_armor" parent="animatedSprite" index="4"]
 visible = false
 
+[node name="Shot" parent="." index="17"]
+actions = [ "alt_fire" ]
+
 [node name="Charge" parent="." index="18"]
 active = false
+
+[node name="Saber" type="Node2D" parent="."]
+script = ExtResource( 3 )
+conflicting_moves = [ "Death", "WeaponStasis", "Damage", "Ride" ]
+actions = [ "fire" ]
+saber_sound_light = ExtResource( 5 )
+saber_sound_heavy = ExtResource( 6 )
+saber_sound_ryuenjin = ExtResource( 7 )
+saber_sound_hyouretsuzan = ExtResource( 8 )
+
+[node name="audioStreamPlayer" type="AudioStreamPlayer2D" parent="Saber"]
+volume_db = -6.0
+max_distance = 600.0
+bus = "SFX"
+
+[node name="SaberArea" type="RigidBody2D" parent="Saber" groups=["Player Projectile"]]
+visible = false
+collision_layer = 4
+collision_mask = 0
+mode = 3
+script = ExtResource( 4 )
+
+[node name="collisionShape2D" type="CollisionShape2D" parent="Saber/SaberArea"]
+shape = SubResource( 1 )
+disabled = true
