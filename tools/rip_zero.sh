@@ -25,9 +25,14 @@ spr_zero_buster,spr_zero_ride_armor"
 # teleport-in and intro poses and the intro plays through unchanged.
 # beam/beam_in/beam_equip come from zero_intro.gml, which splits his own intro
 # sprite into the three stages the Intro module drives.
+# `recover` is only ever played in response to the shot layer toggling, i.e.
+# while shooting, so for Zero it maps to his buster pose rather than his idle.
+# Idle plays it synchronously from inside enable_animation_layer, which is what
+# was overwriting the firing pose and leaving shots coming out of a standing
+# idle.
 ALIAS="damage=dolor2,slide=wall_slide,walljump=wall_jump,\
 shot=buster,\
-recover=idle,victory=complete,walk_start=walk,weak=critical,damage_resist=dolor2,\
+recover=buster,victory=complete,walk_start=walk,weak=critical,damage_resist=dolor2,\
 ride=ride_armor,boost=ride_armor,boost_start=ride_armor,boost_end=ride_armor,\
 wheelie=ride_armor,wheelie_end=ride_armor,break=ride_armor,break_end=ride_armor,\
 stop=ride_armor,stop_end=ride_armor,turn=ride_armor"

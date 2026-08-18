@@ -119,6 +119,7 @@ func activate(index : int, direction := 1) -> void:
 			1: GameManager.set_cheat_infinite_ammo(not GameManager.cheat_infinite_ammo)
 			2: GameManager.set_cheat_infinite_health(not GameManager.cheat_infinite_health)
 			3: GameManager.set_cheat_infinite_lives(not GameManager.cheat_infinite_lives)
+			4: GameManager.set_cheat_fast_max_charge(not GameManager.cheat_fast_max_charge)
 	else:
 		var slot : String = GameManager.armor_slots[index - first_armor_row]
 		GameManager.cycle_cheat_armor(slot, direction)

@@ -299,17 +299,65 @@ func sweep_for_targets(data : Dictionary) -> void:
 		if receiver != null and not (receiver in targets):
 			targets.append(receiver)
 
-# An enemy's hurtbox is its own area, so its extent is what the blade has to
-# reach - the node origin alone is often at its feet.
+# Fallback size when an enemy exposes no shape at all, so the blade still has
+# something roughly body-sized to hit rather than a single point.
+const ASSUMED_ENEMY_SIZE := Vector2(20, 28)
+
+# The enemy's own collision shapes are what the blade has to reach. Enemies vary
+# wildly in how they are built - the hurtbox is not always called "area2D", and
+# is often nested - so every CollisionShape2D underneath is collected and their
+# bounds unioned. Reading only one fixed path made most enemies fall back to a
+# zero-sized rect at their origin, which is why the saber only connected when
+# Zero was standing directly on top of them.
+# Never let a hurt box grow past this. Enemies own shapes far larger than their
+# bodies - detection ranges, attack reach - and sweeping those in made one
+# enemy read as 363px wide, which would have let the saber hit from most of a
+# screen away.
+const MAX_ENEMY_SIZE := Vector2(72, 72)
+
 func hurt_rect(enemy : Node2D) -> Rect2:
-	var area = enemy.get_node_or_null("area2D")
-	if area == null:
-		return Rect2(enemy.global_position, Vector2.ZERO)
-	var shape_node = area.get_node_or_null("collisionShape2D")
-	if shape_node == null or shape_node.shape == null or not shape_node.shape is RectangleShape2D:
-		return Rect2(area.global_position, Vector2.ZERO)
-	var extents : Vector2 = shape_node.shape.extents * area.global_scale.abs()
-	return Rect2(shape_node.global_position - extents, extents * 2.0)
+	#The conventional hurtbox. Preferred when present, because it is the part of
+	#the enemy that is actually meant to be damageable.
+	var hurtbox = enemy.get_node_or_null("area2D")
+	var shapes := collision_shapes(hurtbox) if hurtbox != null else []
+	if shapes.empty():
+		shapes = collision_shapes(enemy)
+
+	var box := Rect2()
+	var found := false
+	for shape_node in shapes:
+		var extents := shape_extents(shape_node)
+		if extents == Vector2.ZERO:
+			continue
+		var here := Rect2(shape_node.global_position - extents, extents * 2.0)
+		box = here if not found else box.merge(here)
+		found = true
+	if not found:
+		return Rect2(enemy.global_position - ASSUMED_ENEMY_SIZE * 0.5, ASSUMED_ENEMY_SIZE)
+
+	if box.size.x > MAX_ENEMY_SIZE.x or box.size.y > MAX_ENEMY_SIZE.y:
+		var clamped := Vector2(min(box.size.x, MAX_ENEMY_SIZE.x), min(box.size.y, MAX_ENEMY_SIZE.y))
+		box = Rect2(enemy.global_position - clamped * 0.5, clamped)
+	return box
+
+func collision_shapes(node : Node, out := []) -> Array:
+	for child in node.get_children():
+		if child is CollisionShape2D and not child.disabled and child.shape != null:
+			out.append(child)
+		if child.get_child_count() > 0:
+			collision_shapes(child, out)
+	return out
+
+func shape_extents(shape_node : CollisionShape2D) -> Vector2:
+	var shape = shape_node.shape
+	var scale : Vector2 = shape_node.global_scale.abs()
+	if shape is RectangleShape2D:
+		return shape.extents * scale
+	if shape is CircleShape2D:
+		return Vector2(shape.radius, shape.radius) * scale
+	if shape is CapsuleShape2D:
+		return Vector2(shape.radius, shape.radius + shape.height * 0.5) * scale
+	return Vector2.ZERO
 
 # Damage is taken by the enemy's damage module, which owns its invulnerability
 # and reduction rules, so it is preferred over the root node.
