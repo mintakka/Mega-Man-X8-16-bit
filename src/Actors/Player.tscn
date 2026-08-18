@@ -3,7 +3,7 @@
 [ext_resource path="res://src/Actors/Player/x_sprites/x.res" type="SpriteFrames" id=1]
 [ext_resource path="res://src/Actors/Player.gd" type="Script" id=2]
 [ext_resource path="res://src/Actors/Player/ZeroSaber.gd" type="Script" id=120]
-[ext_resource path="res://src/Actors/IcarusHeadArea.gd" type="Script" id=121]
+[ext_resource path="res://src/Actors/Player/SaberHitbox.gd" type="Script" id=121]
 [ext_resource path="res://src/Actors/Player/zero_sprites/zero.tres" type="SpriteFrames" id=122]
 [ext_resource path="res://src/Sounds/zero_saber_1.wav" type="AudioStream" id=123]
 [ext_resource path="res://src/Sounds/zero_saber_2.wav" type="AudioStream" id=124]
@@ -1145,11 +1145,10 @@ volume_db = -6.0
 max_distance = 600.0
 bus = "SFX"
 
-[node name="SaberArea" type="RigidBody2D" parent="Saber" groups=["Player Projectile"]]
+[node name="SaberArea" type="KinematicBody2D" parent="Saber" groups=["Player Projectile"]]
 visible = false
 collision_layer = 4
 collision_mask = 0
-mode = 3
 script = ExtResource( 121 )
 
 [node name="collisionShape2D" type="CollisionShape2D" parent="Saber/SaberArea"]

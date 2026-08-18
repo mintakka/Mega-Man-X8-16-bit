@@ -3,6 +3,12 @@ class_name Shot
 
 export var normal_sprites : SpriteFrames
 export var arm_pointing_sprites : SpriteFrames
+#Optional whole-body firing animation. X leaves this empty: he shoots by
+#swapping in an arm-pointing sprite layer, so his body keeps walking or standing
+#underneath. A character drawn with a single full-body firing pose sets it
+#instead. Played after the layer swap so it wins over the "recover" animation
+#that Idle plays in response to shot_layer_enabled.
+export var body_animation := ""
 export var default_arm_point_duration := 0.3
 export var infinite_regular_ammo := false
 export var infinite_charged_ammo := false
@@ -89,6 +95,11 @@ func enable_animation_layer():
 func fire (weapon):
 	enable_animation_layer()
 	restart_animation()
+	#Played here rather than on initialise because enable_animation_layer emits
+	#shot_layer_enabled, which makes Idle replay its recover animation - doing it
+	#earlier would just be overwritten by that.
+	if body_animation != "":
+		character.play_animation(body_animation)
 	weapon.fire(0)
 	timer = 0.0
 

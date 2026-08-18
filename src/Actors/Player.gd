@@ -481,6 +481,10 @@ func become_zero() -> void:
 	var shot = get_node_or_null("Shot")
 	if shot:
 		shot.actions = ["alt_fire"]
+		#Zero is drawn with a single full-body firing pose rather than X's
+		#separate arm layer, so the buster plays it directly.
+		shot.body_animation = "shot"
+		equip_zero_buster(shot)
 	var alt_fire = get_node_or_null("AltFire")
 	if alt_fire:
 		alt_fire.active = false
@@ -493,6 +497,24 @@ func become_zero() -> void:
 
 	for part in get_armor_sprites():
 		part.visible = false
+
+#Zero fires the Icarus buster's uncharged shot - the stronger lemon X gets from
+#the Icarus arms - rather than the default one. He is a melee character, so the
+#buster is a secondary option that hits harder than X's basic shot but, with
+#Charge switched off, never reaches a charged tier at all.
+func equip_zero_buster(shot) -> void:
+	var icarus = shot.get_node_or_null("Icarus Buster")
+	var hermes = shot.get_node_or_null("Hermes Buster")
+	if hermes:
+		hermes.active = false
+	if icarus == null:
+		return
+	icarus.active = true
+	#Left false on purpose: `upgraded` is what unlocks the level 3 charge, and
+	#Zero has no charge shot.
+	shot.upgraded = false
+	shot.update_list_of_weapons()
+	shot.set_current_weapon(icarus)
 
 	var saber = get_node_or_null("Saber")
 	if saber:

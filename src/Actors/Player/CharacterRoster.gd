@@ -30,6 +30,14 @@ const select_frames := {
 	AXL: "",
 }
 
+# The ride armour draws its pilot as its own sprite inside the cockpit, so a
+# character without one visibly turns back into X the moment they mount.
+const pilot_frames := {
+	X: "",
+	ZERO: "res://src/Actors/Props/RideArmor/pilot_sprites/ra_zero.tres",
+	AXL: "",
+}
+
 const display_names := {
 	X: "X",
 	ZERO: "ZERO",
@@ -58,6 +66,9 @@ static func get_select_frames(id : String) -> String:
 #the default and the only character with the armor and weapon systems. The
 #select screen walks this array with left/right, so it has to match the layout
 #or the cursor would appear to move the wrong way.
+static func get_pilot_frames(id : String) -> String:
+	return pilot_frames.get(id, "")
+
 static func get_ids() -> Array:
 	return [ZERO, X, AXL]
 

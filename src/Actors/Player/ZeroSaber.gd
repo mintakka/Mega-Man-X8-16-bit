@@ -93,12 +93,21 @@ const COMBO_GRACE := 0.35
 # of atk_1 were ever visible.
 const AIRBORNE_FRAMES_TO_CANCEL := 4
 
+# Where the blade sits while it is not cutting. Enemies carry no collision layer
+# of their own - they detect an incoming "Player Projectile" body with their own
+# hurtbox area and call hit() on it - so the blade has to physically enter that
+# area for the signal to fire. Toggling the shape's `disabled` flag does not: the
+# area then reports the overlap in get_overlapping_bodies() but never emits
+# body_entered, and no damage is ever dealt. Moving the blade in and out is what
+# produces a real entry transition.
+const PARKED := Vector2(0, 100000)
+
 export var saber_sound_light : AudioStream
 export var saber_sound_heavy : AudioStream
 export var saber_sound_ryuenjin : AudioStream
 export var saber_sound_hyouretsuzan : AudioStream
 
-onready var damage_area : PhysicsBody2D = $SaberArea
+onready var damage_area : KinematicBody2D = $SaberArea
 onready var damage_shape : CollisionShape2D = $SaberArea/collisionShape2D
 
 var attack := ""
@@ -116,7 +125,10 @@ var targets := []
 var last_hit_step := {}
 
 func _ready() -> void:
-	set_hitbox_enabled(false)
+	#The shape stays enabled for the whole life of the ability; position is what
+	#turns the blade on and off.
+	damage_shape.disabled = false
+	park_hitbox()
 
 #A slash is a whole-body animation, unlike X's buster which only swaps an arm
 #layer. Claiming priority makes the swing stop Walk and keeps Idle and Fall -
@@ -176,8 +188,13 @@ func begin_attack(new_attack : String) -> void:
 	queued_next = false
 	targets.clear()
 	last_hit_step.clear()
-	set_hitbox_enabled(false)
+	park_hitbox()
 	var data : Dictionary = ATTACKS[attack]
+	#Sized once per attack rather than every frame, so the shape resource is not
+	#being mutated underneath the physics server mid-swing.
+	if damage_shape.shape is RectangleShape2D:
+		damage_shape.shape = damage_shape.shape.duplicate()
+		damage_shape.shape.extents = data.extents
 	combo_index = COMBO.find(attack)
 	combo_grace = COMBO_GRACE
 	character.play_animation(data.animation)
@@ -252,25 +269,70 @@ func window_is_open(data : Dictionary) -> bool:
 	return data.end == -1 or steps <= data.end
 
 func update_hitbox(data : Dictionary) -> void:
-	var open := window_is_open(data)
-	set_hitbox_enabled(open)
-	if not open:
+	if not window_is_open(data):
+		park_hitbox()
 		return
 	var facing = character.get_facing_direction()
-	damage_shape.position = Vector2(data.offset.x * facing, data.offset.y)
-	if damage_shape.shape is RectangleShape2D:
-		damage_shape.shape.extents = data.extents
+	damage_area.position = Vector2(data.offset.x * facing, data.offset.y)
 
-func set_hitbox_enabled(enabled : bool) -> void:
-	damage_shape.set_deferred("disabled", not enabled)
+func park_hitbox() -> void:
+	damage_area.position = PARKED
+
+# Enemies are found by sweeping the blade's rectangle over everything in the
+# "Enemies" group rather than waiting for their hurtbox to report a collision.
+# The hurtbox route is what the game's projectiles use, but it only fires when
+# the projectile itself travels into the area under its own movement; the blade
+# is teleported in and out for a few frames at a time and the entry event never
+# arrives, so it dealt no damage at all. Sweeping is deterministic and needs no
+# physics events.
+func sweep_for_targets(data : Dictionary) -> void:
+	var facing = character.get_facing_direction()
+	var centre : Vector2 = character.global_position + Vector2(data.offset.x * facing, data.offset.y)
+	var blade := Rect2(centre - data.extents, data.extents * 2.0)
+
+	for enemy in get_tree().get_nodes_in_group("Enemies"):
+		if not is_instance_valid(enemy) or not enemy is Node2D:
+			continue
+		if not blade.has_point(enemy.global_position) and not blade.intersects(hurt_rect(enemy)):
+			continue
+		var receiver = damage_receiver(enemy)
+		if receiver != null and not (receiver in targets):
+			targets.append(receiver)
+
+# An enemy's hurtbox is its own area, so its extent is what the blade has to
+# reach - the node origin alone is often at its feet.
+func hurt_rect(enemy : Node2D) -> Rect2:
+	var area = enemy.get_node_or_null("area2D")
+	if area == null:
+		return Rect2(enemy.global_position, Vector2.ZERO)
+	var shape_node = area.get_node_or_null("collisionShape2D")
+	if shape_node == null or shape_node.shape == null or not shape_node.shape is RectangleShape2D:
+		return Rect2(area.global_position, Vector2.ZERO)
+	var extents : Vector2 = shape_node.shape.extents * area.global_scale.abs()
+	return Rect2(shape_node.global_position - extents, extents * 2.0)
+
+# Damage is taken by the enemy's damage module, which owns its invulnerability
+# and reduction rules, so it is preferred over the root node.
+func damage_receiver(enemy : Node):
+	for child in enemy.get_children():
+		if child.has_method("damage") and "active" in child and child.active:
+			return child
+	if enemy.has_method("damage"):
+		return enemy
+	return null
 
 func damage_targets(data : Dictionary) -> void:
 	if not window_is_open(data):
 		return
+	sweep_for_targets(data)
 	for target in targets:
 		if not is_instance_valid(target):
 			continue
-		if not (target.is_in_group("Enemies") or target.is_in_group("Enemy Projectile")):
+		#What arrives here is whatever the hurtbox passed to hit(), which for an
+		#enemy is its EnemyDamage node rather than the enemy root - so checking
+		#for the "Enemies" group would reject every real hit. Anything that can
+		#take damage exposes damage(); that is the actual contract.
+		if not target.has_method("damage"):
 			continue
 		if not can_hit_again(target, data):
 			continue
@@ -318,7 +380,7 @@ func animation_length(anim : String) -> int:
 	return 0
 
 func _Interrupt() -> void:
-	set_hitbox_enabled(false)
+	park_hitbox()
 	targets.clear()
 	last_hit_step.clear()
 	play_end_animation()
