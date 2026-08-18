@@ -23,8 +23,10 @@ spr_zero_buster,spr_zero_ride_armor"
 # The shared Intro module drives beam/beam_in/beam_equip, which are X's
 # armour-beam animations. Zero has no armour, so they map onto his own
 # teleport-in and intro poses and the intro plays through unchanged.
+# beam/beam_in/beam_equip come from zero_intro.gml, which splits his own intro
+# sprite into the three stages the Intro module drives.
 ALIAS="damage=dolor2,slide=wall_slide,walljump=wall_jump,\
-beam=teleport,beam_in=intro,beam_equip=intro,shot=buster,\
+shot=buster,\
 recover=idle,victory=complete,walk_start=walk,weak=critical,damage_resist=dolor2,\
 ride=ride_armor,boost=ride_armor,boost_start=ride_armor,boost_end=ride_armor,\
 wheelie=ride_armor,wheelie_end=ride_armor,break=ride_armor,break_end=ride_armor,\
@@ -51,6 +53,7 @@ python3 tools/gml_rip.py \
 python3 tools/gml_anims.py \
 	"$MMX_NEXT/scripts/player_animations/player_animations.gml" \
 	"$MMX_NEXT/scripts/player_zero_animations/player_zero_animations.gml" \
+	tools/zero_intro.gml \
 	--out "$WORK/anims.json" >/dev/null
 
 python3 tools/build_spriteframes.py \

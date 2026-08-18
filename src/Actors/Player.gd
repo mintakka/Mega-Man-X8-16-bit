@@ -441,14 +441,9 @@ func become_zero() -> void:
 	animatedSprite.animation = "idle"
 	animatedSprite.frame = 0
 
-	#X's armour beam intro drives beam/beam_in/beam_equip and its own VFX, none of
-	#which suit a character with no armour. Setting only skip_intro here is too
-	#late: Intro is a child, its _ready ran before this and already captured the
-	#flag into debug_skip_intro, so that copy is what has to be overwritten.
-	skip_intro = true
-	var intro = get_node_or_null("Intro")
-	if intro:
-		intro.debug_skip_intro = true
+	#Zero warps in with his own intro sprite, split across the same
+	#beam/beam_in/beam_equip stages the shared Intro module drives, so the
+	#entrance is his art rather than X's armour beam.
 
 	#The Armor node re-applies part visibility every frame from its show_ flags
 	#in _process, so hiding the sprites once is undone a frame later - the flags

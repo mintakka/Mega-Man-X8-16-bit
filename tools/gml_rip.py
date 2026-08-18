@@ -45,10 +45,18 @@ def frame_order(meta):
     return [f["name"] for f in meta.get("frames", [])]
 
 
+def find_sprite_folder(sprites_dirs, name):
+    for d in sprites_dirs.split(":"):
+        folder = os.path.join(d, name)
+        if os.path.isdir(folder):
+            return folder
+    return None
+
+
 class Sprite:
     def __init__(self, sprites_dir, name):
         self.name = name
-        folder = os.path.join(sprites_dir, name)
+        folder = find_sprite_folder(sprites_dir, name)
         meta = load_yy(os.path.join(folder, name + ".yy"))
         seq = meta["sequence"]
         self.width = meta["width"]
@@ -119,7 +127,8 @@ def shelf_pack(sizes, max_width):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--sprites-dir", required=True)
+    parser.add_argument("--sprites-dir", required=True,
+                        help="colon-separated list of sprite dirs, searched in order")
     parser.add_argument("--names", required=True, help="comma-separated sprite folder names")
     parser.add_argument("--out-png", required=True)
     parser.add_argument("--out-index", required=True, help="JSON frame index for the .tres builder")
@@ -130,8 +139,7 @@ def main():
     names = [n.strip() for n in args.names.split(",") if n.strip()]
     sprites = []
     for name in names:
-        folder = os.path.join(args.sprites_dir, name)
-        if not os.path.isdir(folder):
+        if find_sprite_folder(args.sprites_dir, name) is None:
             print("missing sprite: " + name, file=sys.stderr)
             return 1
         sprites.append(Sprite(args.sprites_dir, name))

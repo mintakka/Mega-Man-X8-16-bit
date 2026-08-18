@@ -9,6 +9,7 @@ var frames := 0
 var player
 var saber
 var seen := {}
+var _last_anim := ""
 
 func _ready() -> void:
 	pause_mode = Node.PAUSE_MODE_PROCESS
@@ -46,7 +47,12 @@ func _physics_process(_d) -> void:
 	if frames == 60:
 		player.active = true
 		player.visible = true
-		player.activate()
+		Event.emit_signal("intro_x")
+	if frames >= 61 and frames <= 200:
+		var a = player.get_animation()
+		if a != _last_anim:
+			print("HARNESS f%d intro_anim=%s" % [frames, a])
+			_last_anim = a
 
 	# mash fire every 12 frames - this is what a player does
 	if frames >= 90 and frames < 200 and (frames - 90) % 12 == 0:
