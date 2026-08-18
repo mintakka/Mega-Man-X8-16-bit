@@ -21,10 +21,12 @@ const color_icarus := Color(0.45, 0.82, 1.0, 1.0)
 const color_hermes := Color(1.0, 0.66, 0.27, 1.0)
 
 const row_nodes := ["god_mode", "infinite_ammo", "infinite_health", "infinite_lives",
+	"fast_charge",
 	"armor_head", "armor_body", "armor_arms", "armor_legs"]
 const row_labels := ["GOD MODE", "WEAPON ENERGY", "LIFE ENERGY", "LIVES",
+	"FAST CHARGE",
 	"HEAD", "BODY", "ARMS", "LEGS"]
-const first_armor_row := 4
+const first_armor_row := 5
 
 onready var panel: Control = $Panel
 onready var rows: Control = $Panel/Border/VBox
@@ -40,6 +42,10 @@ func _ready() -> void:
 
 func _input(event: InputEvent) -> void:
 	if not visible:
+		return
+	#Locked until the code is entered on the options screen. Checked here rather
+	#than on _ready so unlocking mid-session takes effect without a reload.
+	if not GameManager.cheats_unlocked:
 		return
 	if is_toggle_event(event):
 		toggle_menu()
@@ -77,6 +83,8 @@ func toggle_menu() -> void:
 		open_menu()
 
 func open_menu() -> void:
+	if not GameManager.cheats_unlocked:
+		return
 	open = true
 	panel.visible = true
 	GameManager.pause(PAUSE_SOURCE)
@@ -135,6 +143,7 @@ func get_toggle_value(index : int) -> bool:
 		1: return GameManager.cheat_infinite_ammo
 		2: return GameManager.cheat_infinite_health
 		3: return GameManager.cheat_infinite_lives
+		4: return GameManager.cheat_fast_max_charge
 	return false
 
 func display_toggle(label : Label, value : bool) -> void:

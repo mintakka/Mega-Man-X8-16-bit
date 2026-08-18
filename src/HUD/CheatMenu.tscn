@@ -153,6 +153,28 @@ custom_fonts/font = ExtResource( 2 )
 text = "OFF"
 align = 2
 
+[node name="fast_charge" type="HBoxContainer" parent="Panel/Border/VBox"]
+mouse_filter = 2
+
+[node name="name" type="Label" parent="Panel/Border/VBox/fast_charge"]
+size_flags_horizontal = 3
+mouse_filter = 2
+custom_colors/font_color = Color( 0.85098, 0.898039, 1, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_offset_x = 1
+custom_constants/shadow_offset_y = 1
+custom_fonts/font = ExtResource( 2 )
+text = "5 FAST CHARGE"
+
+[node name="value" type="Label" parent="Panel/Border/VBox/fast_charge"]
+mouse_filter = 2
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_offset_x = 1
+custom_constants/shadow_offset_y = 1
+custom_fonts/font = ExtResource( 2 )
+text = "OFF"
+align = 2
+
 [node name="armor_divider" type="ColorRect" parent="Panel/Border/VBox"]
 modulate = Color( 1, 1, 1, 0.470588 )
 rect_min_size = Vector2( 0, 1 )
@@ -180,7 +202,7 @@ custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_offset_x = 1
 custom_constants/shadow_offset_y = 1
 custom_fonts/font = ExtResource( 2 )
-text = "5 HEAD"
+text = "6 HEAD"
 
 [node name="value" type="Label" parent="Panel/Border/VBox/armor_head"]
 mouse_filter = 2
@@ -202,7 +224,7 @@ custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_offset_x = 1
 custom_constants/shadow_offset_y = 1
 custom_fonts/font = ExtResource( 2 )
-text = "6 BODY"
+text = "7 BODY"
 
 [node name="value" type="Label" parent="Panel/Border/VBox/armor_body"]
 mouse_filter = 2
@@ -224,7 +246,7 @@ custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_offset_x = 1
 custom_constants/shadow_offset_y = 1
 custom_fonts/font = ExtResource( 2 )
-text = "7 ARMS"
+text = "8 ARMS"
 
 [node name="value" type="Label" parent="Panel/Border/VBox/armor_arms"]
 mouse_filter = 2
@@ -246,7 +268,7 @@ custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_offset_x = 1
 custom_constants/shadow_offset_y = 1
 custom_fonts/font = ExtResource( 2 )
-text = "8 LEGS"
+text = "9 LEGS"
 
 [node name="value" type="Label" parent="Panel/Border/VBox/armor_legs"]
 mouse_filter = 2

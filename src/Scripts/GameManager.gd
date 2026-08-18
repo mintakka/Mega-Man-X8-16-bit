@@ -718,11 +718,27 @@ func is_cheating() -> bool:
 		return false
 	return used_cheats
 
+#The in-game cheat menu stays locked until the code is entered on the options
+#screen. This is deliberately per-boot rather than saved: the game is meant to
+#start honest every launch, so the code is re-entered to re-enable cheats.
+const cheat_code_length := 6
+const cheat_unlock_code := "082404"
+var cheats_unlocked := false
+
+#Returns whether the code was right. A wrong code never re-locks an already
+#unlocked session - there is nothing to gain from punishing a typo.
+func try_unlock_cheats(code : String) -> bool:
+	if code == cheat_unlock_code:
+		cheats_unlocked = true
+		return true
+	return false
+
 #Player Cheats
 var cheat_god_mode := false
 var cheat_infinite_ammo := false
 var cheat_infinite_health := false
 var cheat_infinite_lives := false
+var cheat_fast_max_charge := false
 const cheat_invulnerability_source := "cheat_god_mode"
 
 func set_cheat_god_mode(value : bool) -> void:
@@ -744,6 +760,13 @@ func set_cheat_infinite_health(value : bool) -> void:
 
 func set_cheat_infinite_lives(value : bool) -> void:
 	cheat_infinite_lives = value
+	if value:
+		used_cheats = true
+
+#Charge.gd reads this straight off GameManager while charging, so there is
+#nothing to push onto the player here.
+func set_cheat_fast_max_charge(value : bool) -> void:
+	cheat_fast_max_charge = value
 	if value:
 		used_cheats = true
 

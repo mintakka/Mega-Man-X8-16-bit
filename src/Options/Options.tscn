@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=2]
+[gd_scene load_steps=28 format=2]
 
 [ext_resource path="res://src/Fonts/Xclassicfont.fnt" type="BitmapFont" id=1]
 [ext_resource path="res://src/Fonts/X8Bossfont.fnt" type="BitmapFont" id=2]
@@ -17,6 +17,8 @@
 [ext_resource path="res://src/Options/DebugOption.gd" type="Script" id=15]
 [ext_resource path="res://src/Options/ResetConfigs.gd" type="Script" id=16]
 [ext_resource path="res://src/Options/ChargeFadeOut.gd" type="Script" id=17]
+[ext_resource path="res://src/Options/AutonomousMenuButton.gd" type="Script" id=25]
+[ext_resource path="res://src/Options/CheatCode.tscn" type="PackedScene" id=26]
 [ext_resource path="res://src/Options/KeyBinder/scrollbar.tres" type="Theme" id=18]
 [ext_resource path="res://src/Options/Vsync.gd" type="Script" id=19]
 [ext_resource path="res://src/Options/AspectRatio.gd" type="Script" id=24]
@@ -943,6 +945,36 @@ custom_constants/shadow_offset_y = 1
 custom_fonts/font = ExtResource( 1 )
 text = "CLEARSAVE_OPTION"
 uppercase = true
+
+[node name="cheatcode" type="TextureButton" parent="Menu/scrollContainer/OptionHolder"]
+modulate = Color( 0.407843, 0.792157, 1, 1 )
+self_modulate = Color( 1, 1, 1, 0 )
+margin_top = 165.0
+margin_right = 200.0
+margin_bottom = 173.0
+rect_min_size = Vector2( 0, 8 )
+action_mode = 0
+script = ExtResource( 25 )
+menu_path = NodePath("../../../..")
+idle_color = Color( 0.407843, 0.792157, 1, 1 )
+focus_color = Color( 0.984314, 1, 0.686275, 1 )
+pick_sound = NodePath("../../../../choice")
+
+[node name="CheatCode" parent="Menu/scrollContainer/OptionHolder/cheatcode" instance=ExtResource( 26 )]
+layer = 5
+visible = false
+
+[node name="text" type="Label" parent="Menu/scrollContainer/OptionHolder/cheatcode"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_top = -7.0
+margin_right = 189.0
+margin_bottom = 7.0
+custom_colors/font_color_shadow = Color( 0.415686, 0.415686, 0.415686, 1 )
+custom_constants/shadow_offset_x = 1
+custom_constants/shadow_offset_y = 1
+custom_fonts/font = ExtResource( 1 )
+text = "CHEAT CODE"
 
 [node name="clearachiev" type="TextureButton" parent="Menu/scrollContainer/OptionHolder"]
 modulate = Color( 0.466667, 0.0745098, 0.0745098, 1 )

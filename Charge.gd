@@ -121,14 +121,24 @@ func get_charge_just_pressed() -> bool:
 func get_charge_released() -> bool:
 	return not get_action_pressed(charge_button)
 
+#The fast-max-charge cheat collapses the top tier onto the mid tier's timing, so
+#the buster reaches maximum in the time a medium charge normally takes. Because
+#both thresholds then sit at the same instant, charge level 2 stops being
+#reachable at all and the buster steps straight from 1 to 3 - which is the point
+#of the cheat, not a side effect.
+func get_max_charge_time() -> float:
+	if GameManager.cheat_fast_max_charge:
+		return level_3_charge
+	return level_4_charge
+
 func get_charge_level() -> int:
 	if charged_time < minimum_charge_time * (1 - charge_time_reduction):
 		return 0
 	if charged_time < level_3_charge * (1 - charge_time_reduction):
 		return 1
-	if charged_time < level_4_charge * (1 - charge_time_reduction):
+	if charged_time < get_max_charge_time() * (1 - charge_time_reduction):
 		return 2
-	if charged_time > level_4_charge * (1 - charge_time_reduction):
+	if charged_time > get_max_charge_time() * (1 - charge_time_reduction):
 		if arm_cannon.upgraded:
 			return 3
 		else:
@@ -155,7 +165,7 @@ func charge(_delta:float):
 				emit_charged_particle()
 				mid_charge = true
 	if not max_charge:
-		if super_charge_time > 0 and charged_time > level_4_charge * (1 - charge_time_reduction):
+		if super_charge_time > 0 and charged_time > get_max_charge_time() * (1 - charge_time_reduction):
 			if arm_cannon.upgraded:
 				Log("Started super VFX")
 				max_charge = true
