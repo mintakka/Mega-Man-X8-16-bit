@@ -434,11 +434,23 @@ func swap_to_active_character() -> bool:
 
 	var slot := get_index()
 	var host := get_parent()
-	#Keep the node name so any NodePath a level points at the player still lands.
+
+	#A level is still instancing its own children when this runs, and Godot
+	#refuses add_child on a parent that is "busy setting up children" - it fails
+	#with an error rather than an exception, which previously left the stage with
+	#no player at all: this X had already renamed itself and queued its own free,
+	#and the replacement never arrived. Everything that touches the tree is
+	#therefore deferred, and deferred calls run in the order they are queued, so
+	#the child is added before it is moved into place.
+	#
+	#The name is handed over first, while still synchronous, because a node
+	#cannot take a name a sibling still holds - the replacement would silently
+	#become "X2" and every NodePath aimed at the player would miss.
 	var kept_name := name
 	name = kept_name + "_replaced"
-	host.add_child(replacement)
 	replacement.name = kept_name
-	host.move_child(replacement, slot)
-	queue_free()
+
+	host.call_deferred("add_child", replacement)
+	host.call_deferred("move_child", replacement, slot)
+	call_deferred("queue_free")
 	return true

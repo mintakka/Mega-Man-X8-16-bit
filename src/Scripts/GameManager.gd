@@ -39,6 +39,12 @@ var current_stage_info : StageInfo
 #play for the current stage. They differ whenever a stage forces a character -
 #Noah's Park is always X - and keeping the pick separate means being forced into
 #X for the intro does not overwrite what the player chose for later missions.
+#Set when checkpoint positioning was asked for while no player existed yet.
+#A swapped-in character joins the tree a frame after the level does, so the
+#deferred positioning can arrive first and silently skip, which would drop Zero
+#at the stage entrance instead of the checkpoint he died at.
+var pending_checkpoint_positioning := false
+
 var picked_character := CharacterRoster.DEFAULT
 var active_character := CharacterRoster.DEFAULT
 
@@ -401,6 +407,7 @@ func clear_checkpoint() -> void:
 
 func position_player_on_checkpoint() -> void:
 	if not player:
+		pending_checkpoint_positioning = true
 		return
 	if GameManager.time_attack:
 		return
@@ -416,6 +423,11 @@ func position_player_on_checkpoint() -> void:
 func set_player(object):
 	print_debug("Setting player: " + object.name)
 	player = object
+	#Only retried when it was genuinely skipped, so a character that registered
+	#in time is never repositioned twice - that would re-fire the checkpoint door.
+	if pending_checkpoint_positioning:
+		pending_checkpoint_positioning = false
+		call_deferred("position_player_on_checkpoint")
 	player.active = false
 	player.visible = false
 	player.deactivate()
