@@ -72,10 +72,12 @@ const ATTACKS := {
 # previous one is swinging.
 const COMBO := ["atk1", "atk2", "atk3"]
 
-# GML gates the follow-up on state_timer: the press only registers after step 3,
-# and the swap happens no earlier than step 8, so a mashed button cannot skip
-# through the whole chain instantly.
-const COMBO_INPUT_STEP := 3
+# The swap happens no earlier than step 8 so a mashed button cannot skip through
+# the whole chain instantly. GML also ignores the press until step 3, but it
+# polls a held key where this reads an edge, so the press that started the swing
+# cannot re-register anyway - only step 0 needs excluding. Accepting the
+# follow-up from step 1 makes mashing work, which the stricter window did not.
+const COMBO_INPUT_STEP := 0
 const COMBO_SWAP_STEP := 8
 
 export var saber_sound_light : AudioStream

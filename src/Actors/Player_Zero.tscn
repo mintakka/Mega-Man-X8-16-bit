@@ -14,6 +14,7 @@ extents = Vector2( 14, 12 )
 
 [node name="Zero" instance=ExtResource( 1 )]
 allow_character_swap = false
+skip_intro = true
 
 [node name="animatedSprite" parent="." index="3"]
 position = Vector2( 0, -7 )
@@ -38,6 +39,9 @@ visible = false
 
 [node name="Shot" parent="." index="17"]
 actions = [ "alt_fire" ]
+normal_sprites = ExtResource( 2 )
+arm_pointing_sprites = ExtResource( 2 )
+animation = "shot"
 
 [node name="Charge" parent="." index="18"]
 active = false

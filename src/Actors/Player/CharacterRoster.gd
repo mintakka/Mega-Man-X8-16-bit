@@ -52,8 +52,12 @@ static func get_display_name(id : String) -> String:
 static func get_select_frames(id : String) -> String:
 	return select_frames.get(id, "")
 
+#Left-to-right order on the select screen. X sits in the middle because he is
+#the default and the only character with the armor and weapon systems. The
+#select screen walks this array with left/right, so it has to match the layout
+#or the cursor would appear to move the wrong way.
 static func get_ids() -> Array:
-	return [X, ZERO, AXL]
+	return [ZERO, X, AXL]
 
 # Returns the character a stage will actually be played with, which is the
 # player's pick unless the stage forces one.

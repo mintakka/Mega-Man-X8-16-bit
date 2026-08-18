@@ -33,8 +33,8 @@ anchor_bottom = 1.0
 mouse_filter = 2
 
 [node name="x" type="Control" parent="Slots"]
-anchor_left = 0.25
-anchor_right = 0.25
+anchor_left = 0.5
+anchor_right = 0.5
 mouse_filter = 2
 
 [node name="sprite" type="AnimatedSprite" parent="Slots/x"]
@@ -63,8 +63,8 @@ text = "^"
 align = 1
 
 [node name="zero" type="Control" parent="Slots"]
-anchor_left = 0.5
-anchor_right = 0.5
+anchor_left = 0.25
+anchor_right = 0.25
 mouse_filter = 2
 
 [node name="sprite" type="AnimatedSprite" parent="Slots/zero"]
