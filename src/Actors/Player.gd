@@ -2,6 +2,12 @@ extends Character
 
 export var skip_intro := false
 
+#Levels embed X directly, so he doubles as the spawn marker for whoever the
+#player actually picked: on load he hands the slot over to Zero or Axl and
+#removes himself. Scenes that need X specifically regardless of the pick - the
+#weapon-get cutscenes, test levels - can clear this.
+export var allow_character_swap := true
+
 var current_armor = ["no_head", "no_body", "no_arms", "no_legs"]
 var armor_sprites = []
 var flash_timer := 0.0
@@ -96,6 +102,8 @@ func increase_hitbox():
 	
 
 func _ready() -> void:
+	if allow_character_swap and swap_to_active_character():
+		return
 	current_armor = ["no_head", "no_body", "no_arms", "no_legs"]
 	Event.listen("collected", self, "equip_parts")
 	Event.listen("collected", self, "collect")
@@ -398,3 +406,39 @@ func stop_forced_movement(forcer = null):
 	if not is_executing("Ride"):
 		emit_signal("stop_forced_movement", forcer)
 		grabbed = false
+
+
+#Replaces this X instance with the character the player took into the stage.
+#Returns true when a swap happened, in which case the caller must stop setting
+#itself up - this node is on its way out and must never reach
+#GameManager.set_player, or the freed X would be registered as the live player.
+func swap_to_active_character() -> bool:
+	var id : String = GameManager.active_character
+	if id == CharacterRoster.X or not CharacterRoster.is_implemented(id):
+		return false
+
+	var scene = load(CharacterRoster.get_scene_path(id))
+	if scene == null:
+		Log("Could not load character scene for " + id + ", staying as X")
+		return false
+
+	var replacement = scene.instance()
+	replacement.transform = transform
+	#Levels override the sprite material for their own lighting (the dark
+	#sections of Inferno and Pitch Black), so carry it across or the swapped-in
+	#character ignores the level's lighting.
+	var sprite = get_node_or_null("animatedSprite")
+	var new_sprite = replacement.get_node_or_null("animatedSprite")
+	if sprite and new_sprite and sprite.material:
+		new_sprite.material = sprite.material
+
+	var slot := get_index()
+	var host := get_parent()
+	#Keep the node name so any NodePath a level points at the player still lands.
+	var kept_name := name
+	name = kept_name + "_replaced"
+	host.add_child(replacement)
+	replacement.name = kept_name
+	host.move_child(replacement, slot)
+	queue_free()
+	return true

@@ -35,6 +35,13 @@ const player_life_count := "player_lives"
 
 var current_stage_info : StageInfo
 
+#Which character the player picked on the select screen, and the one actually in
+#play for the current stage. They differ whenever a stage forces a character -
+#Noah's Park is always X - and keeping the pick separate means being forced into
+#X for the intro does not overwrite what the player chose for later missions.
+var picked_character := CharacterRoster.DEFAULT
+var active_character := CharacterRoster.DEFAULT
+
 var time_attack:= false
 var ta_status := "Recording..."
 
@@ -223,6 +230,9 @@ func start_level(StageName : String) -> void:
 	clear_checkpoint()
 	set_player_lives_to_at_least_2()
 	current_level = StageName
+	#Resolved once here, at the point the stage is known, so every later reload,
+	#checkpoint respawn and death retry inside the stage reuses the same answer.
+	active_character = CharacterRoster.resolve_for_stage(StageName, picked_character)
 	var path : String
 	if StageName == "NoahsPark":
 		path = "res://src/Levels/NoahsPark/Intro_NoahsPark.tscn"
