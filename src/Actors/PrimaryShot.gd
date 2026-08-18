@@ -70,7 +70,15 @@ func manual_save_shot() -> void:
 func fire (weapon):
 	enable_animation_layer()
 	restart_animation()
-	weapon.fire(charge_level)
+	var firing_level := charge_level
+	#An ordinary X buster press becomes the normal fully charged blast. A held
+	#press still runs Charge and may later release the upgraded tier-3 shot, so
+	#only substitute shots which began at level zero.
+	if GameManager.cheat_fast_max_charge and \
+		GameManager.active_character == CharacterRoster.X and \
+		current_weapon_is_buster() and charge_level == 0:
+		firing_level = 2
+	weapon.fire(firing_level)
 	timer = 0.0
 	charge_level = 0
 	#Log("Fired at " + str(OS.get_ticks_msec()))

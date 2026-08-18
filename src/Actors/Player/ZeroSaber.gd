@@ -18,6 +18,7 @@ class_name ZeroSaber
 # `interval` steps, which is what makes Ryuenjin and Hyouretsuzan multi-hit.
 
 const SINGLE_HIT := 1
+const DAMAGE_MULTIPLIER := 2.5
 const SaberMasks = preload("res://src/Actors/Player/zero_sprites/saber_masks.gd")
 
 const ATTACKS := {
@@ -400,8 +401,26 @@ func damage_targets(data : Dictionary) -> void:
 		if not can_hit_again(target, data):
 			continue
 		last_hit_step[target] = steps
-		target.damage(data.damage, self)
+		apply_saber_hit(target, data)
 		character.emit_signal("melee_hit", target)
+
+#Zero trades projectile safety for close-range power. A 2-damage light slash
+#therefore lands for 5, enough to one-shot the ordinary 1-5 HP enemies while
+#leaving sturdier reploids, ride armour and bosses as multi-hit targets.
+func saber_damage(data : Dictionary) -> float:
+	return float(data.damage) * DAMAGE_MULTIPLIER
+
+func apply_saber_hit(target : Node, data : Dictionary) -> void:
+	var damage_value := DamageValue.new(
+		saber_damage(data), self, "Zero Saber", character.get_facing_direction(),
+		true, character.global_position)
+	#EnemyDamage.direct_hit routes through an active shield first. Because this
+	#DamageValue breaks guards, a hidden Metool receives the same guard-break and
+	#stagger event as X's charged buster instead of simply ignoring the blade.
+	if target.has_method("direct_hit"):
+		target.direct_hit(damage_value)
+	else:
+		target.damage(damage_value.get_damage(), self)
 
 func can_hit_again(target, data : Dictionary) -> bool:
 	if not last_hit_step.has(target):

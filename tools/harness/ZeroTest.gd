@@ -17,6 +17,8 @@ var near_enemy
 var far_enemy
 var near_mask_touched := false
 var far_mask_touched := false
+var walk_probe : AnimatedSprite
+var walk_probe_frames := {}
 
 func _ready() -> void:
 	pause_mode = Node.PAUSE_MODE_PROCESS
@@ -49,6 +51,8 @@ func _physics_process(_d) -> void:
 			print("HARNESS shot normal=%s armpoint=%s actions=%s" % [
 				shot.normal_sprites.has_animation("atk_1"),
 				shot.arm_pointing_sprites.has_animation("atk_1"), shot.actions])
+			if character == "zero":
+				assert(not player.get_node("Charge").active)
 		return
 
 	if frames == 60:
@@ -139,10 +143,31 @@ func _physics_process(_d) -> void:
 			near_mask_touched, far_mask_touched, near_enemy.current_health])
 		assert(near_mask_touched)
 		assert(not far_mask_touched)
-		assert(near_enemy.current_health < near_enemy.max_health)
+		assert(near_enemy.current_health <= near_enemy.max_health - 5.0)
 
 	if frames == 340:
 		print("HARNESS slashes seen: ", seen.keys())
+		if character != "zero":
+			print("HARNESS SURVIVED")
+			get_tree().quit()
+
+	# Run the generated steady walk long past its old one-shot duration. The
+	# frame must continue changing after it reaches the ranged loop tail.
+	if frames == 360 and character == "zero":
+		walk_probe = AnimatedSprite.new()
+		walk_probe.frames = load("res://src/Actors/Player/zero_sprites/zero.tres")
+		walk_probe.animation = "walk"
+		walk_probe.play()
+		add_child(walk_probe)
+	if walk_probe != null:
+		walk_probe_frames[walk_probe.frame] = true
+	if frames == 480 and character == "zero":
+		print("HARNESS long walk frames=%s looping=%s playing=%s" % [
+			walk_probe_frames.keys(), walk_probe.frames.get_animation_loop("walk"),
+			walk_probe.playing])
+		assert(walk_probe.frames.get_animation_loop("walk"))
+		assert(walk_probe_frames.size() > 1)
+		assert(walk_probe.playing)
 		print("HARNESS SURVIVED")
 		get_tree().quit()
 

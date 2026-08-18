@@ -763,8 +763,8 @@ func set_cheat_infinite_lives(value : bool) -> void:
 	if value:
 		used_cheats = true
 
-#Charge.gd reads this straight off GameManager while charging, so there is
-#nothing to push onto the player here.
+#PrimaryShot turns an ordinary X buster press into the normal fully charged
+#blast. Holding continues from that tier toward the upgraded mega blast.
 func set_cheat_fast_max_charge(value : bool) -> void:
 	cheat_fast_max_charge = value
 	if value:

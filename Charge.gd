@@ -59,6 +59,11 @@ func on_unpause():
 func _Setup():
 	setup_charge_fadeout()
 	set_current_charge_button()
+	#FAST CHARGE starts X at the ordinary full-charge tier. Keeping the Charge
+	#ability alive lets an upgraded buster continue from there to its tier-3
+	#shot; releasing before tier 3 simply keeps the blast fired on the press.
+	if is_fast_charge_buster():
+		charged_time = level_3_charge * (1 - charge_time_reduction)
 
 func setup_charge_fadeout() -> void:
 	audio.volume_db = charge1_volume
@@ -90,6 +95,9 @@ func _StartCondition() -> bool:
 	return false
 
 func _Update(_delta:float) -> void:
+	if is_fast_charge_buster():
+		update_fast_charge(_delta)
+		return
 	if get_charge_released() and character.listening_to_inputs or get_charge_just_pressed() and character.listening_to_inputs:
 		if charged_time > minimum_charge_time * (1 - charge_time_reduction):
 			emit_fire_charged_signal(get_charge_level())
@@ -100,6 +108,25 @@ func _Update(_delta:float) -> void:
 	else:
 		if character.listening_to_inputs:
 			EndAbility()
+
+func update_fast_charge(delta : float) -> void:
+	if get_charge_released() and character.listening_to_inputs:
+		#The normal full-charge blast was already fired on the initial press. Only
+		#emit a second shot when the player held long enough to reach the upgraded
+		#tier (Icarus laser or Hermes triad).
+		if get_charge_level() >= 3:
+			emit_fire_charged_signal(get_charge_level())
+		else:
+			EndAbility()
+	elif get_charge_pressed():
+		charge(delta)
+	elif character.listening_to_inputs:
+		EndAbility()
+
+func is_fast_charge_buster() -> bool:
+	return GameManager.cheat_fast_max_charge and \
+		GameManager.active_character == CharacterRoster.X and \
+		arm_cannon.current_weapon and arm_cannon.current_weapon_is_buster()
 
 onready var charge_button = get_default_charge_button()
 
@@ -121,14 +148,7 @@ func get_charge_just_pressed() -> bool:
 func get_charge_released() -> bool:
 	return not get_action_pressed(charge_button)
 
-#The fast-max-charge cheat collapses the top tier onto the mid tier's timing, so
-#the buster reaches maximum in the time a medium charge normally takes. Because
-#both thresholds then sit at the same instant, charge level 2 stops being
-#reachable at all and the buster steps straight from 1 to 3 - which is the point
-#of the cheat, not a side effect.
 func get_max_charge_time() -> float:
-	if GameManager.cheat_fast_max_charge:
-		return level_3_charge
 	return level_4_charge
 
 func get_charge_level() -> int:

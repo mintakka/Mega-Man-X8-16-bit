@@ -3,16 +3,16 @@ extends Character
 export var skip_intro := false
 
 #Levels embed X directly, so he doubles as the spawn marker for whoever the
-#player actually picked: on load he hands the slot over to Zero or Axl and
-#removes himself. Scenes that need X specifically regardless of the pick - the
-#weapon-get cutscenes, test levels - can clear this.
+#player actually picked: on load he reconfigures that slot as Zero. Scenes that
+#need X specifically regardless of the pick - weapon-get cutscenes and test
+#levels - can clear this.
 export var allow_character_swap := true
 
-#False when playing a character with no armor system. The armor pipeline has
-#many entry points - the save's collectibles on level start, capsule pickups,
-#and the armor cheat - and all of them funnel through equip_parts, so that is
-#where this is enforced rather than at each caller.
+#Gameplay armor abilities and their artwork are separate capabilities. Zero
+#inherits the former but disables the latter so selected parts affect movement,
+#defense and attacks without drawing X's overlays on his sprites.
 var armor_capable := true
+var armor_art_enabled := true
 
 var current_armor = ["no_head", "no_body", "no_arms", "no_legs"]
 var armor_sprites = []
@@ -246,7 +246,8 @@ func equip_parts(collectible : String):
 	if is_armor_part(collectible):
 		add_part_to_current_armor(collectible)
 		call("equip_" + collectible + "_parts")
-		get_node("Armor").display(collectible)
+		if armor_art_enabled:
+			get_node("Armor").display(collectible)
 		emit_signal("equipped_armor")
 		using_upgrades = true
 		
@@ -438,7 +439,8 @@ func become_zero() -> void:
 		Log("Zero shooting sprites missing, staying as X")
 		return
 
-	armor_capable = false
+	armor_capable = true
+	armor_art_enabled = false
 
 	animatedSprite.frames = frames
 	animatedSprite.position.y = -7
@@ -494,8 +496,8 @@ func become_zero() -> void:
 	if alt_fire:
 		alt_fire.active = false
 
-	#Zero has no charge shot in the source engine (charge_unlocked is false), and
-	#the charge palette VFX assume X's colours anyway.
+	#Zero's buster is a regular-shot fallback only. His saber owns the close-range
+	#power and guard breaking, so the shared X charge state stays disabled.
 	var charge = get_node_or_null("Charge")
 	if charge:
 		charge.active = false
@@ -503,10 +505,8 @@ func become_zero() -> void:
 	for part in get_armor_sprites():
 		part.visible = false
 
-#Zero fires the Icarus buster's uncharged shot - the stronger lemon X gets from
-#the Icarus arms - rather than the default one. He is a melee character, so the
-#buster is a secondary option that hits harder than X's basic shot but, with
-#Charge switched off, never reaches a charged tier at all.
+#Zero fires the Icarus buster's stronger regular shot. It never reaches a charge
+#tier; the saber supplies his high damage and guard-breaking utility instead.
 func equip_zero_buster(shot) -> void:
 	var icarus = shot.get_node_or_null("Icarus Buster")
 	var hermes = shot.get_node_or_null("Hermes Buster")
@@ -515,8 +515,8 @@ func equip_zero_buster(shot) -> void:
 	if icarus == null:
 		return
 	icarus.active = true
-	#Left false on purpose: `upgraded` is what unlocks the level 3 charge, and
-	#Zero has no charge shot.
+	#Left false on purpose: `upgraded` unlocks the level-3 laser, and Zero has no
+	#charged buster tier.
 	shot.upgraded = false
 	shot.update_list_of_weapons()
 	shot.set_current_weapon(icarus)

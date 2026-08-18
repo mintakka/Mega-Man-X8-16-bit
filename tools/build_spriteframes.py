@@ -8,7 +8,9 @@ variable frame durations exactly, which a single Godot `speed` value could not.
 
 GML loops over a sub-range (loop_start..loop_end) but Godot only loops whole
 animations, so a ranged loop is split: the named animation plays once and holds,
-and a `<name>_loop` animation carries just the looping tail.
+and a `<name>_loop` animation carries just the looping tail. Animations listed
+with --loop-only instead expose that tail under the original name, for state
+machines that already play a separate startup animation.
 """
 
 import argparse
@@ -29,6 +31,9 @@ def main():
     parser.add_argument("--atlas", required=True, help="atlas png path inside the project")
     parser.add_argument("--prefix", required=True, help="sprite folder prefix, e.g. spr_zero_")
     parser.add_argument("--only", help="comma-separated animation names to emit")
+    parser.add_argument("--loop-only", default="",
+                        help="comma-separated ranged animations whose named entry "
+                             "should contain only the looping tail")
     parser.add_argument("--alias", default="",
                         help="godot=gml pairs, so Zero answers to the same animation "
                              "names X's ability nodes already drive (damage=dolor2)")
@@ -57,6 +62,7 @@ def main():
         sprite_map[source_name] = replacement
 
     wanted = [n.strip() for n in args.only.split(",")] if args.only else sorted(anims)
+    loop_only = set(n.strip() for n in args.loop_only.split(",") if n.strip())
 
     # One AtlasTexture per distinct region, shared by every frame that uses it.
     regions = {}
@@ -98,6 +104,13 @@ def main():
             continue
 
         ranged = len(loop) == 2 and loop[0] > 0
+        if ranged and name in loop_only:
+            start, end = loop[0], min(loop[1], len(ids) - 1)
+            tail = ids[start:end + 1]
+            if tail:
+                built.append((name, tail, True))
+            continue
+
         built.append((name, ids, len(loop) == 2 and loop[0] == 0))
         if ranged:
             start, end = loop[0], min(loop[1], len(ids) - 1)

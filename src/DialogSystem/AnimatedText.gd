@@ -21,11 +21,15 @@ var bg_grow_speed := 2
 var text_to_display := ""
 var state := "stopped"
 var character := "Default"
+var displayed_text_palette : Texture
 
 signal dialog_concluded
 
 const portrait_position_1 := 15
 const portrait_position_2 := 175
+const x_profile_name := "MegaMan X"
+const zero_portrait_frames := preload("res://src/DialogSystem/portraits/zero_dialogue.tres")
+const zero_text_palette := preload("res://src/DialogSystem/font_colors/Red.png")
 
 func _ready() -> void:
 	bg_scale = bg.scale
@@ -104,10 +108,14 @@ func increase_step() -> void:
 	debug_print ("Increased step, now: " + str(dialog_step))
 
 func setup_character(step) -> void:
-	portrait_1.frames = step.portrait_animations
-	material.set_shader_param("palette", step.text_palette)
+	var reskin_x_as_zero : bool = step.name == x_profile_name and \
+		GameManager.active_character == CharacterRoster.ZERO
+	portrait_1.frames = zero_portrait_frames if reskin_x_as_zero else step.portrait_animations
+	portrait_1.scale = Vector2(2, 2) if reskin_x_as_zero else Vector2.ONE
+	displayed_text_palette = zero_text_palette if reskin_x_as_zero else step.text_palette
+	material.set_shader_param("palette", displayed_text_palette)
 	letter_sound.pitch_scale = step.audio_pitch
-	if step.name == "MegaMan X":
+	if step.name == x_profile_name:
 		portrait_1.position.x = portrait_position_1
 		portrait_side.margin_left = 36
 		portrait_side.margin_right = 176
@@ -115,6 +123,9 @@ func setup_character(step) -> void:
 		portrait_1.position.x = portrait_position_2
 		portrait_side.margin_left = 0
 		portrait_side.margin_right = 141
+	#Keep the original profile name for cutscene animation events. The existing
+	#interactions still speak X's lines and therefore need their existing
+	#"MegaMan X" event key; only their presentation is reskinned.
 	character = step.name
 	debug_print("Loaded Character: " + character)
 

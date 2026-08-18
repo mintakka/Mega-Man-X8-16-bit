@@ -82,6 +82,7 @@ python3 tools/build_spriteframes.py \
 	--prefix "spr_zero_" \
 	--alias "$ALIAS" \
 	--only "$ANIMS" \
+	--loop-only "walk" \
 	--out "$OUT/zero.tres"
 
 python3 tools/build_spriteframes.py \
@@ -93,9 +94,13 @@ python3 tools/build_spriteframes.py \
 	--sprite-map "$SHOOT_SPRITES" \
 	--resource-name "pointing_cannon" \
 	--only "$ANIMS" \
+	--loop-only "walk" \
 	--out "$OUT/zero_shoot.tres"
 
 python3 tools/build_zero_saber_masks.py \
 	--sprites-dir "$MMX_NEXT/sprites" \
 	--anims "$WORK/anims.json" \
 	--out "$OUT/saber_masks.gd"
+
+MMX_NEXT="$MMX_NEXT" python3 tools/make_zero_pilot.py
+MMX_NEXT="$MMX_NEXT" python3 tools/make_zero_pause_icons.py

@@ -9,7 +9,6 @@ class_name CharacterRoster
 # id degrading to X keeps a stage playable instead of loading nothing.
 const X := "x"
 const ZERO := "zero"
-const AXL := "axl"
 
 const DEFAULT := X
 
@@ -18,7 +17,6 @@ const DEFAULT := X
 const scenes := {
 	X: "res://src/Actors/Player.tscn",
 	ZERO: "res://src/Actors/Player.tscn",
-	AXL: "res://src/Actors/Player.tscn",
 }
 
 # Idle animations for the select screen. These are the same SpriteFrames the
@@ -27,7 +25,6 @@ const scenes := {
 const select_frames := {
 	X: "res://src/Actors/Player/x_sprites/x.res",
 	ZERO: "res://src/Actors/Player/zero_sprites/zero.tres",
-	AXL: "",
 }
 
 # Optional full-body firing layers. X composes a separate arm layer, while
@@ -35,7 +32,6 @@ const select_frames := {
 const shoot_frames := {
 	X: "",
 	ZERO: "res://src/Actors/Player/zero_sprites/zero_shoot.tres",
-	AXL: "",
 }
 
 # The ride armour draws its pilot as its own sprite inside the cockpit, so a
@@ -43,13 +39,11 @@ const shoot_frames := {
 const pilot_frames := {
 	X: "",
 	ZERO: "res://src/Actors/Props/RideArmor/pilot_sprites/ra_zero.tres",
-	AXL: "",
 }
 
 const display_names := {
 	X: "X",
 	ZERO: "ZERO",
-	AXL: "AXL",
 }
 
 # Stages that ignore the player's pick. Noah's Park is the intro mission and is
@@ -73,15 +67,13 @@ static func get_select_frames(id : String) -> String:
 static func get_shoot_frames(id : String) -> String:
 	return shoot_frames.get(id, "")
 
-#Left-to-right order on the select screen. X sits in the middle because he is
-#the default and the only character with the armor and weapon systems. The
-#select screen walks this array with left/right, so it has to match the layout
-#or the cursor would appear to move the wrong way.
+#Left-to-right order on the select screen. Keep the roster limited to characters
+#that are actually in scope and playable.
 static func get_pilot_frames(id : String) -> String:
 	return pilot_frames.get(id, "")
 
 static func get_ids() -> Array:
-	return [ZERO, X, AXL]
+	return [ZERO, X]
 
 # Returns the character a stage will actually be played with, which is the
 # player's pick unless the stage forces one.

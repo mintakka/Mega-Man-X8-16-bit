@@ -22,8 +22,13 @@ func connect_lock_signals(_menu) -> void:
 	if _menu:
 		if not menu:
 			menu = _menu
-		_menu.connect("unlock_buttons",self,"enable")
-		_menu.connect("lock_buttons",self,"disable")
+		# Some menu-button subclasses also resolve their owner in _ready. Keep
+		# this idempotent so opening a submenu cannot leave duplicate signal
+		# connections (or depend on callback inheritance order).
+		if not _menu.is_connected("unlock_buttons", self, "enable"):
+			_menu.connect("unlock_buttons",self,"enable")
+		if not _menu.is_connected("lock_buttons", self, "disable"):
+			_menu.connect("lock_buttons",self,"disable")
 
 func enable() -> void:
 	focus_mode = Control.FOCUS_ALL
