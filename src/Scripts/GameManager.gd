@@ -815,6 +815,9 @@ func cycle_cheat_armor(slot : String, direction := 1) -> void:
 func apply_cheat_armor() -> void:
 	if not is_player_in_scene():
 		return
+	#The armor cheat only means something on a character with the armor system.
+	if not player.armor_capable:
+		return
 	for slot in armor_slots:
 		var set_name : String = cheat_armor[slot]
 		if set_name != "normal":

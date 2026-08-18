@@ -19,6 +19,11 @@ import sys
 
 CALL = re.compile(r"animation_add\s*\(\s*\"([^\"]+)\"\s*,\s*\[([^\]]*)\]\s*((?:,\s*-?\d+\s*)*)\)")
 
+# A bare animation_add("name") has no timing table at all: GameMaker just plays
+# the sprite at its own fps. Emitted with empty keyframes and picked up by the
+# builder, which expands it to every frame of the sprite.
+BARE = re.compile(r"animation_add\s*\(\s*\"([^\"]+)\"\s*\)")
+
 # Some animations borrow another animation's timing wholesale instead of
 # repeating the table, e.g. the airborne Raikousen:
 #   animation_add("atk_raikousen_air", animations_frames[? "atk_raikousen"]);
@@ -54,6 +59,11 @@ def parse(path):
         # one and is meant to override it (player_zero_animations redefines
         # "jump", "dash" and friends on top of player_animations).
         out[name] = {"sprite": sprite, "keyframes": pairs, "loop": loop}
+
+    for match in BARE.finditer(text):
+        raw_name = match.group(1)
+        name, _, sprite = raw_name.partition("|")
+        out[name] = {"sprite": sprite or name, "keyframes": [], "loop": [], "native_fps": True}
 
     for match in REF.finditer(text):
         raw_name, source, trailing = match.group(1), match.group(2), match.group(3)

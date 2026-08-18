@@ -8,6 +8,12 @@ export var skip_intro := false
 #weapon-get cutscenes, test levels - can clear this.
 export var allow_character_swap := true
 
+#False when playing a character with no armor system. The armor pipeline has
+#many entry points - the save's collectibles on level start, capsule pickups,
+#and the armor cheat - and all of them funnel through equip_parts, so that is
+#where this is enforced rather than at each caller.
+var armor_capable := true
+
 var current_armor = ["no_head", "no_body", "no_arms", "no_legs"]
 var armor_sprites = []
 var flash_timer := 0.0
@@ -235,6 +241,8 @@ func is_full_armor() -> String:
 	return "no_armor"
 
 func equip_parts(collectible : String):
+	if is_armor_part(collectible) and not armor_capable:
+		return
 	if is_armor_part(collectible):
 		add_part_to_current_armor(collectible)
 		call("equip_" + collectible + "_parts")
@@ -426,14 +434,40 @@ func become_zero() -> void:
 		Log("Zero sprites missing, staying as X")
 		return
 
+	armor_capable = false
+
 	animatedSprite.frames = frames
 	animatedSprite.position.y = -7
 	animatedSprite.animation = "idle"
 	animatedSprite.frame = 0
 
 	#X's armour beam intro drives beam/beam_in/beam_equip and its own VFX, none of
-	#which suit a character with no armour.
+	#which suit a character with no armour. Setting only skip_intro here is too
+	#late: Intro is a child, its _ready ran before this and already captured the
+	#flag into debug_skip_intro, so that copy is what has to be overwritten.
 	skip_intro = true
+	var intro = get_node_or_null("Intro")
+	if intro:
+		intro.debug_skip_intro = true
+
+	#The Armor node re-applies part visibility every frame from its show_ flags
+	#in _process, so hiding the sprites once is undone a frame later - the flags
+	#have to go false and the process loop has to stop, or X's armour overlays
+	#draw on top of Zero whenever the save has armour.
+	var armor_node = get_node_or_null("Armor")
+	if armor_node:
+		armor_node.show_head = false
+		armor_node.show_body = false
+		armor_node.show_arms = false
+		armor_node.show_legs = false
+		armor_node.set_process(false)
+
+	#Weapon select cycles X's boss-weapon palettes onto the sprite material;
+	#Zero has no boss weapons, so switching would only recolour him wrongly.
+	var weapon_changer = get_node_or_null("WeaponChanger")
+	if weapon_changer:
+		weapon_changer.active = false
+		weapon_changer.set_process(false)
 
 	#Shot and AltFire both swap SpriteFrames wholesale through
 	#set_animation_layer, so both sets on both nodes have to be Zero's or firing
@@ -456,14 +490,15 @@ func become_zero() -> void:
 	if alt_fire:
 		alt_fire.active = false
 
-	var saber = get_node_or_null("Saber")
-	if saber:
-		saber.active = true
-
-	#Zero has no charge shot in the source engine (charge_unlocked is false).
+	#Zero has no charge shot in the source engine (charge_unlocked is false), and
+	#the charge palette VFX assume X's colours anyway.
 	var charge = get_node_or_null("Charge")
 	if charge:
 		charge.active = false
 
 	for part in get_armor_sprites():
 		part.visible = false
+
+	var saber = get_node_or_null("Saber")
+	if saber:
+		saber.active = true

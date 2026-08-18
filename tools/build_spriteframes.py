@@ -65,11 +65,19 @@ def main():
             skipped.append((name, "no animation table"))
             continue
         sprite, steps, loop = entry["sprite"], entry["frames"], entry["loop"]
+        sprite_entry = index["sprites"].get(args.prefix + sprite)
+        if sprite_entry is None:
+            skipped.append((name, "sprite %s not in atlas" % (args.prefix + sprite)))
+            continue
+        if not steps and entry.get("native_fps"):
+            # Bare animation_add: play the whole sprite at its own fps, looping.
+            hold = max(1, int(round(60.0 / max(1.0, sprite_entry["fps"]))))
+            steps = []
+            for i in range(len(sprite_entry["frames"])):
+                steps.extend([i] * hold)
+            loop = [0, len(steps)]
         if not steps:
             skipped.append((name, "empty keyframe table"))
-            continue
-        if args.prefix + sprite not in index["sprites"]:
-            skipped.append((name, "sprite %s not in atlas" % (args.prefix + sprite)))
             continue
 
         ids = [region_id(sprite, i) for i in steps]

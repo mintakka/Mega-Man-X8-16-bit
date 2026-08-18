@@ -20,6 +20,11 @@ func _ready() -> void:
 		level = env_level
 	GameManager.active_character = character
 	GameManager.cheats_unlocked = true
+	#Simulate a save that has armour, which is what put X's armour overlay on
+	#top of Zero in Dynasty.
+	for part in ["icarus_head", "icarus_body", "hermes_arms", "hermes_legs"]:
+		if not part in GameManager.collectibles:
+			GameManager.collectibles.append(part)
 	add_child(load(level).instance())
 	print("HARNESS instanced %s as %s" % [level.get_file(), character])
 
@@ -59,6 +64,13 @@ func _physics_process(_d) -> void:
 	if frames == 228:
 		var f = player.get_node("animatedSprite").frames
 		print("HARNESS sprites_after_buster=%s" % f.resource_path.get_file())
+	if frames in [65, 130, 250]:
+		var spr = player.get_node("animatedSprite")
+		var shown = []
+		for c in spr.get_children():
+			if "armor" in c.name and c.visible:
+				shown.append(c.name)
+		print("HARNESS f%d armor_parts_visible=%s intro_anim=%s" % [frames, shown, player.get_animation()])
 
 	if frames == 260:
 		print("HARNESS slashes seen: ", seen.keys())

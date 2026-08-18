@@ -1051,6 +1051,11 @@ script = ExtResource( 6 )
 menu = NodePath("../Menu")
 
 [connection signal="initialize" from="." to="Menu/scrollContainer/OptionHolder/ShowDebug/Button" method="_on_OptionsMenu_initialize"]
+[connection signal="focus_entered" from="Menu/scrollContainer/OptionHolder/cheatcode" to="Menu/scrollContainer/OptionHolder/cheatcode" method="_on_focus_entered"]
+[connection signal="focus_exited" from="Menu/scrollContainer/OptionHolder/cheatcode" to="Menu/scrollContainer/OptionHolder/cheatcode" method="_on_focus_exited"]
+[connection signal="mouse_entered" from="Menu/scrollContainer/OptionHolder/cheatcode" to="Menu/scrollContainer/OptionHolder/cheatcode" method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="Menu/scrollContainer/OptionHolder/cheatcode" to="Menu/scrollContainer/OptionHolder/cheatcode" method="_on_mouse_exited"]
+[connection signal="pressed" from="Menu/scrollContainer/OptionHolder/cheatcode" to="Menu/scrollContainer/OptionHolder/cheatcode" method="_on_pressed"]
 [connection signal="focus_entered" from="Menu/scrollContainer/OptionHolder/Language/Button" to="Menu/scrollContainer/OptionHolder/Language/Button" method="_on_focus_entered"]
 [connection signal="focus_exited" from="Menu/scrollContainer/OptionHolder/Language/Button" to="Menu/scrollContainer/OptionHolder/Language/Button" method="_on_focus_exited"]
 [connection signal="mouse_entered" from="Menu/scrollContainer/OptionHolder/Language/Button" to="Menu/scrollContainer/OptionHolder/Language/Button" method="_on_mouse_entered"]

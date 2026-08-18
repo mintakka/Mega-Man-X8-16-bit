@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" load_steps=273 format=2]
+[gd_resource type="SpriteFrames" load_steps=278 format=2]
 
 [ext_resource path="res://src/Actors/Player/zero_sprites/zero.png" type="Texture" id=1]
 
@@ -329,7 +329,7 @@ margin = Rect2( 114, 52, 212, 93 )
 [sub_resource type="AtlasTexture" id=55]
 flags = 4
 atlas = ExtResource( 1 )
-region = Rect2( 1327, 372, 1, 1 )
+region = Rect2( 1452, 372, 1, 1 )
 margin = Rect2( 0, 0, 261, 127 )
 
 [sub_resource type="AtlasTexture" id=56]
@@ -1049,7 +1049,7 @@ margin = Rect2( 111, 47, 205, 89 )
 [sub_resource type="AtlasTexture" id=175]
 flags = 4
 atlas = ExtResource( 1 )
-region = Rect2( 1331, 372, 1, 1 )
+region = Rect2( 1456, 372, 1, 1 )
 margin = Rect2( 0, 0, 261, 127 )
 
 [sub_resource type="AtlasTexture" id=176]
@@ -1211,7 +1211,7 @@ margin = Rect2( 112, 47, 205, 87 )
 [sub_resource type="AtlasTexture" id=202]
 flags = 4
 atlas = ExtResource( 1 )
-region = Rect2( 1333, 372, 1, 1 )
+region = Rect2( 1458, 372, 1, 1 )
 margin = Rect2( 0, 0, 261, 127 )
 
 [sub_resource type="AtlasTexture" id=203]
@@ -1628,6 +1628,36 @@ atlas = ExtResource( 1 )
 region = Rect2( 1738, 149, 38, 45 )
 margin = Rect2( 112, 41, 224, 83 )
 
+[sub_resource type="AtlasTexture" id=272]
+flags = 4
+atlas = ExtResource( 1 )
+region = Rect2( 1327, 372, 26, 23 )
+margin = Rect2( 116, 41, 236, 105 )
+
+[sub_resource type="AtlasTexture" id=273]
+flags = 4
+atlas = ExtResource( 1 )
+region = Rect2( 1354, 372, 24, 23 )
+margin = Rect2( 117, 41, 238, 105 )
+
+[sub_resource type="AtlasTexture" id=274]
+flags = 4
+atlas = ExtResource( 1 )
+region = Rect2( 1379, 372, 23, 23 )
+margin = Rect2( 117, 41, 239, 105 )
+
+[sub_resource type="AtlasTexture" id=275]
+flags = 4
+atlas = ExtResource( 1 )
+region = Rect2( 1403, 372, 23, 23 )
+margin = Rect2( 118, 41, 239, 105 )
+
+[sub_resource type="AtlasTexture" id=276]
+flags = 4
+atlas = ExtResource( 1 )
+region = Rect2( 1427, 372, 24, 22 )
+margin = Rect2( 119, 42, 238, 106 )
+
 [resource]
 animations = [ {
 "frames": [ SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 2 ), SubResource( 2 ), SubResource( 2 ), SubResource( 2 ), SubResource( 3 ), SubResource( 3 ), SubResource( 3 ), SubResource( 3 ), SubResource( 3 ), SubResource( 3 ), SubResource( 3 ), SubResource( 3 ), SubResource( 2 ), SubResource( 2 ), SubResource( 2 ), SubResource( 2 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 2 ), SubResource( 2 ), SubResource( 2 ), SubResource( 2 ), SubResource( 3 ), SubResource( 3 ), SubResource( 3 ), SubResource( 3 ), SubResource( 2 ), SubResource( 2 ), SubResource( 2 ), SubResource( 2 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 1 ), SubResource( 2 ), SubResource( 2 ), SubResource( 2 ), SubResource( 2 ), SubResource( 3 ), SubResource( 3 ), SubResource( 3 ), SubResource( 3 ) ],
@@ -1898,5 +1928,60 @@ animations = [ {
 "frames": [ SubResource( 35 ), SubResource( 35 ), SubResource( 35 ), SubResource( 36 ), SubResource( 36 ), SubResource( 36 ), SubResource( 36 ), SubResource( 37 ), SubResource( 37 ), SubResource( 36 ), SubResource( 36 ), SubResource( 37 ), SubResource( 37 ), SubResource( 36 ), SubResource( 36 ), SubResource( 37 ), SubResource( 37 ), SubResource( 36 ), SubResource( 36 ), SubResource( 36 ), SubResource( 36 ), SubResource( 37 ), SubResource( 36 ), SubResource( 36 ), SubResource( 36 ), SubResource( 36 ), SubResource( 36 ), SubResource( 36 ), SubResource( 36 ), SubResource( 36 ), SubResource( 35 ), SubResource( 35 ) ],
 "loop": false,
 "name": "damage_resist",
+"speed": 60.0
+}, {
+"frames": [ SubResource( 272 ), SubResource( 272 ), SubResource( 273 ), SubResource( 273 ), SubResource( 274 ), SubResource( 274 ), SubResource( 275 ), SubResource( 275 ), SubResource( 276 ), SubResource( 276 ) ],
+"loop": true,
+"name": "ride",
+"speed": 60.0
+}, {
+"frames": [ SubResource( 272 ), SubResource( 272 ), SubResource( 273 ), SubResource( 273 ), SubResource( 274 ), SubResource( 274 ), SubResource( 275 ), SubResource( 275 ), SubResource( 276 ), SubResource( 276 ) ],
+"loop": true,
+"name": "boost",
+"speed": 60.0
+}, {
+"frames": [ SubResource( 272 ), SubResource( 272 ), SubResource( 273 ), SubResource( 273 ), SubResource( 274 ), SubResource( 274 ), SubResource( 275 ), SubResource( 275 ), SubResource( 276 ), SubResource( 276 ) ],
+"loop": true,
+"name": "boost_start",
+"speed": 60.0
+}, {
+"frames": [ SubResource( 272 ), SubResource( 272 ), SubResource( 273 ), SubResource( 273 ), SubResource( 274 ), SubResource( 274 ), SubResource( 275 ), SubResource( 275 ), SubResource( 276 ), SubResource( 276 ) ],
+"loop": true,
+"name": "boost_end",
+"speed": 60.0
+}, {
+"frames": [ SubResource( 272 ), SubResource( 272 ), SubResource( 273 ), SubResource( 273 ), SubResource( 274 ), SubResource( 274 ), SubResource( 275 ), SubResource( 275 ), SubResource( 276 ), SubResource( 276 ) ],
+"loop": true,
+"name": "wheelie",
+"speed": 60.0
+}, {
+"frames": [ SubResource( 272 ), SubResource( 272 ), SubResource( 273 ), SubResource( 273 ), SubResource( 274 ), SubResource( 274 ), SubResource( 275 ), SubResource( 275 ), SubResource( 276 ), SubResource( 276 ) ],
+"loop": true,
+"name": "wheelie_end",
+"speed": 60.0
+}, {
+"frames": [ SubResource( 272 ), SubResource( 272 ), SubResource( 273 ), SubResource( 273 ), SubResource( 274 ), SubResource( 274 ), SubResource( 275 ), SubResource( 275 ), SubResource( 276 ), SubResource( 276 ) ],
+"loop": true,
+"name": "break",
+"speed": 60.0
+}, {
+"frames": [ SubResource( 272 ), SubResource( 272 ), SubResource( 273 ), SubResource( 273 ), SubResource( 274 ), SubResource( 274 ), SubResource( 275 ), SubResource( 275 ), SubResource( 276 ), SubResource( 276 ) ],
+"loop": true,
+"name": "break_end",
+"speed": 60.0
+}, {
+"frames": [ SubResource( 272 ), SubResource( 272 ), SubResource( 273 ), SubResource( 273 ), SubResource( 274 ), SubResource( 274 ), SubResource( 275 ), SubResource( 275 ), SubResource( 276 ), SubResource( 276 ) ],
+"loop": true,
+"name": "stop",
+"speed": 60.0
+}, {
+"frames": [ SubResource( 272 ), SubResource( 272 ), SubResource( 273 ), SubResource( 273 ), SubResource( 274 ), SubResource( 274 ), SubResource( 275 ), SubResource( 275 ), SubResource( 276 ), SubResource( 276 ) ],
+"loop": true,
+"name": "stop_end",
+"speed": 60.0
+}, {
+"frames": [ SubResource( 272 ), SubResource( 272 ), SubResource( 273 ), SubResource( 273 ), SubResource( 274 ), SubResource( 274 ), SubResource( 275 ), SubResource( 275 ), SubResource( 276 ), SubResource( 276 ) ],
+"loop": true,
+"name": "turn",
 "speed": 60.0
 } ]
