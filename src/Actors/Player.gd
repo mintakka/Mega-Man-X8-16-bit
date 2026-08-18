@@ -433,6 +433,10 @@ func become_zero() -> void:
 	if frames == null:
 		Log("Zero sprites missing, staying as X")
 		return
+	var shoot_frames = load(CharacterRoster.get_shoot_frames(CharacterRoster.ZERO))
+	if shoot_frames == null:
+		Log("Zero shooting sprites missing, staying as X")
+		return
 
 	armor_capable = false
 
@@ -464,15 +468,16 @@ func become_zero() -> void:
 		weapon_changer.active = false
 		weapon_changer.set_process(false)
 
-	#Shot and AltFire both swap SpriteFrames wholesale through
-	#set_animation_layer, so both sets on both nodes have to be Zero's or firing
-	#turns him back into X and breaks every animation that follows. He has no
-	#separate arm layer, so the swap is then inert.
+	# Shot and AltFire both swap SpriteFrames wholesale through
+	# set_animation_layer. MMX-Next's X1 Zero has full-body shooting variants for
+	# standing, walking, jumping, dashing, crouching and wall movement; using that
+	# set as the pointing layer preserves the active locomotion animation instead
+	# of freezing him in the unrelated X5 buster recoil pose.
 	for node_name in ["Shot", "AltFire"]:
 		var shooter = get_node_or_null(node_name)
 		if shooter:
 			shooter.normal_sprites = frames
-			shooter.arm_pointing_sprites = frames
+			shooter.arm_pointing_sprites = shoot_frames
 
 	#Zero's buster moves to alt_fire because the saber owns fire. AltFire is
 	#already bound to alt_fire for X's special weapons, and Zero has none in the
@@ -481,9 +486,9 @@ func become_zero() -> void:
 	var shot = get_node_or_null("Shot")
 	if shot:
 		shot.actions = ["alt_fire"]
-		#Zero is drawn with a single full-body firing pose rather than X's
-		#separate arm layer, so the buster plays it directly.
-		shot.body_animation = "shot"
+		# The shooting layer already follows the locomotion animation. A forced
+		# body animation would overwrite it and stop Zero's running cycle.
+		shot.body_animation = ""
 		equip_zero_buster(shot)
 	var alt_fire = get_node_or_null("AltFire")
 	if alt_fire:

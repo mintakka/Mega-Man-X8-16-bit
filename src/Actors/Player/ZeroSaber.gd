@@ -1,70 +1,65 @@
 extends Movement
 class_name ZeroSaber
 
-# Zero's Z-Saber. One ability covers every slash rather than a node per attack,
-# because they all share the same shape - pick an attack from the current
-# context, play its animation, open a damage window partway through - and the
-# ground combo needs to hand off between them mid-animation, which is far
-# simpler to do inside one state than across three conflicting abilities.
+# Zero's Z-Saber. One ability covers every slash: pick an attack from the current
+# context, play its animation and matching source collision mask, then open its
+# damage window partway through. The ground combo also hands off between attacks
+# mid-animation, which is far simpler inside one state than across conflicting
+# abilities.
 #
 # The numbers are lifted from MMX-Next's player_saber_init: damage, and the
-# [start, end, interval] hit windows. Those windows are measured in 60fps game
-# steps (GML reads them off state_timer), and this project's Zero animations are
-# expanded to one frame per 60fps step, so a step index here is also the
-# animation frame index. That is the whole reason the rip preserves step timing.
+# [start, end, interval] hit windows. The collision itself is generated from
+# MMX-Next's precise, per-frame saber masks, aligned to the same 60 Hz animation
+# timeline. This keeps reach on the visible blade instead of approximating each
+# attack with a large hand-authored rectangle.
 #
 # interval == 1 means a single hit landed on the start step. interval > 1 means
 # the blade stays live from start to end and may hit the same target again every
 # `interval` steps, which is what makes Ryuenjin and Hyouretsuzan multi-hit.
 
 const SINGLE_HIT := 1
+const SaberMasks = preload("res://src/Actors/Player/zero_sprites/saber_masks.gd")
 
-# offset/extents describe the blade box in pixels, before facing is applied.
 const ATTACKS := {
 	"atk1": {
 		"animation": "atk_1", "damage": 2, "start": 0, "end": 6, "interval": SINGLE_HIT,
-		"offset": Vector2(16, -8), "extents": Vector2(14, 12), "ground": true,
+		"ground": true,
 	},
 	"atk2": {
 		"animation": "atk_2", "damage": 2, "start": 2, "end": 6, "interval": SINGLE_HIT,
-		"offset": Vector2(16, -8), "extents": Vector2(14, 12), "ground": true,
+		"ground": true,
 	},
 	"atk3": {
 		"animation": "atk_3", "damage": 1, "start": 0, "end": 8, "interval": 6,
-		"offset": Vector2(18, -8), "extents": Vector2(16, 14), "ground": true,
+		"ground": true,
 	},
 	"jump": {
 		"animation": "atk_jump", "damage": 2, "start": 1, "end": 8, "interval": 2,
-		"offset": Vector2(14, -4), "extents": Vector2(14, 14), "ground": false,
+		"ground": false,
 	},
 	"wall": {
 		"animation": "atk_wall", "damage": 2, "start": 3, "end": 8, "interval": 2,
-		"offset": Vector2(12, -6), "extents": Vector2(12, 12), "ground": false,
+		"ground": false,
 	},
 	"mikazukizan": {
 		"animation": "atk_mikazukizan", "damage": 3, "start": 1, "end": 8, "interval": 6,
-		"offset": Vector2(0, -8), "extents": Vector2(20, 18), "ground": false,
-		"rise": 150.0,
+		"ground": false, "rise": 150.0,
 	},
 	"ryuenjin": {
 		"animation": "atk_ryuenjin", "damage": 1, "start": 4, "end": 30, "interval": 6,
-		"offset": Vector2(10, -18), "extents": Vector2(12, 20), "ground": true,
-		"rise": 250.0,
+		"ground": true, "rise": 250.0,
 	},
 	"hyouretsuzan": {
 		"animation": "atk_hyouretsuzan", "damage": 2, "start": 4, "end": -1, "interval": 6,
-		"offset": Vector2(0, 12), "extents": Vector2(10, 18), "ground": false,
-		"dive": 320.0,
+		"ground": false, "dive": 320.0,
 	},
 	"shippuuga": {
 		"animation": "atk_shippuuga", "damage": 2, "start": 2, "end": 10, "interval": 6,
-		"offset": Vector2(18, -6), "extents": Vector2(16, 12), "ground": true,
-		"lunge": 170.0,
+		"ground": true, "lunge": 170.0,
 	},
 	"raikousen": {
 		"animation": "atk_raikousen", "damage": 2, "start": 12, "end": 32, "interval": 6,
-		"offset": Vector2(24, -6), "extents": Vector2(30, 10), "ground": false,
-		"lunge": 300.0,
+		"ground": false, "lunge": 300.0,
 	},
 }
 
@@ -93,22 +88,10 @@ const COMBO_GRACE := 0.35
 # of atk_1 were ever visible.
 const AIRBORNE_FRAMES_TO_CANCEL := 4
 
-# Where the blade sits while it is not cutting. Enemies carry no collision layer
-# of their own - they detect an incoming "Player Projectile" body with their own
-# hurtbox area and call hit() on it - so the blade has to physically enter that
-# area for the signal to fire. Toggling the shape's `disabled` flag does not: the
-# area then reports the overlap in get_overlapping_bodies() but never emits
-# body_entered, and no damage is ever dealt. Moving the blade in and out is what
-# produces a real entry transition.
-const PARKED := Vector2(0, 100000)
-
 export var saber_sound_light : AudioStream
 export var saber_sound_heavy : AudioStream
 export var saber_sound_ryuenjin : AudioStream
 export var saber_sound_hyouretsuzan : AudioStream
-
-onready var damage_area : KinematicBody2D = $SaberArea
-onready var damage_shape : CollisionShape2D = $SaberArea/collisionShape2D
 
 var attack := ""
 var steps := 0
@@ -123,12 +106,6 @@ var targets := []
 # Target -> the step it was last damaged on, so a sustained blade re-hits on the
 # attack's own interval instead of once per frame.
 var last_hit_step := {}
-
-func _ready() -> void:
-	#The shape stays enabled for the whole life of the ability; position is what
-	#turns the blade on and off.
-	damage_shape.disabled = false
-	park_hitbox()
 
 #A slash is a whole-body animation, unlike X's buster which only swaps an arm
 #layer. Claiming priority makes the swing stop Walk and keeps Idle and Fall -
@@ -188,13 +165,7 @@ func begin_attack(new_attack : String) -> void:
 	queued_next = false
 	targets.clear()
 	last_hit_step.clear()
-	park_hitbox()
 	var data : Dictionary = ATTACKS[attack]
-	#Sized once per attack rather than every frame, so the shape resource is not
-	#being mutated underneath the physics server mid-swing.
-	if damage_shape.shape is RectangleShape2D:
-		damage_shape.shape = damage_shape.shape.duplicate()
-		damage_shape.shape.extents = data.extents
 	combo_index = COMBO.find(attack)
 	combo_grace = COMBO_GRACE
 	character.play_animation(data.animation)
@@ -224,7 +195,6 @@ func _Update(delta : float) -> void:
 
 	apply_movement(data, delta)
 	hold_loop_segment(data)
-	update_hitbox(data)
 	damage_targets(data)
 
 	if steps > COMBO_INPUT_STEP and attack_just_pressed():
@@ -268,96 +238,140 @@ func window_is_open(data : Dictionary) -> bool:
 	#the whole dive and is ended by hitting the ground instead.
 	return data.end == -1 or steps <= data.end
 
-func update_hitbox(data : Dictionary) -> void:
-	if not window_is_open(data):
-		park_hitbox()
+# MMX-Next does precise per-frame collision against the saber sprite. The
+# generated mask data stores that alpha silhouette as merged pixel cells. Each
+# cell is transformed exactly like Zero's AnimatedSprite, then intersected with
+# the enemy's actual damage Area2D shape. This also fixes the earlier ownership
+# mistake: the "Enemies" group contains EnemyDamage receivers, not necessarily
+# enemy roots, so searching below the group member could never find its sibling
+# hurtbox and fell back to guessed body sizes.
+func sweep_for_targets(_data : Dictionary) -> void:
+	var mask_rects : Array = SaberMasks.rects_for(attack, steps)
+	if mask_rects.empty():
+		targets.clear()
 		return
-	var facing = character.get_facing_direction()
-	damage_area.position = Vector2(data.offset.x * facing, data.offset.y)
+	var mask_polygons := make_mask_polygons(mask_rects)
+	if mask_polygons.empty():
+		targets.clear()
+		return
 
-func park_hitbox() -> void:
-	damage_area.position = PARKED
-
-# Enemies are found by sweeping the blade's rectangle over everything in the
-# "Enemies" group rather than waiting for their hurtbox to report a collision.
-# The hurtbox route is what the game's projectiles use, but it only fires when
-# the projectile itself travels into the area under its own movement; the blade
-# is teleported in and out for a few frames at a time and the entry event never
-# arrives, so it dealt no damage at all. Sweeping is deterministic and needs no
-# physics events.
-func sweep_for_targets(data : Dictionary) -> void:
-	var facing = character.get_facing_direction()
-	var centre : Vector2 = character.global_position + Vector2(data.offset.x * facing, data.offset.y)
-	var blade := Rect2(centre - data.extents, data.extents * 2.0)
-
-	for enemy in get_tree().get_nodes_in_group("Enemies"):
-		if not is_instance_valid(enemy) or not enemy is Node2D:
+	var overlapping := []
+	for member in get_tree().get_nodes_in_group("Enemies"):
+		if not is_instance_valid(member):
 			continue
-		if not blade.has_point(enemy.global_position) and not blade.intersects(hurt_rect(enemy)):
+		var receiver = damage_receiver(member)
+		if receiver == null or receiver in overlapping:
 			continue
-		var receiver = damage_receiver(enemy)
-		if receiver != null and not (receiver in targets):
-			targets.append(receiver)
+		if masks_hit_receiver(mask_polygons, receiver):
+			overlapping.append(receiver)
+	targets = overlapping
 
-# Fallback size when an enemy exposes no shape at all, so the blade still has
-# something roughly body-sized to hit rather than a single point.
-const ASSUMED_ENEMY_SIZE := Vector2(20, 28)
+func make_mask_polygons(rects : Array) -> Array:
+	var polygons := []
+	var sprite_transform : Transform2D = character.animatedSprite.global_transform
+	for rect in rects:
+		var local := PoolVector2Array([
+			rect.position,
+			Vector2(rect.end.x, rect.position.y),
+			rect.end,
+			Vector2(rect.position.x, rect.end.y),
+		])
+		polygons.append(transform_polygon(local, sprite_transform))
+	return polygons
 
-# The enemy's own collision shapes are what the blade has to reach. Enemies vary
-# wildly in how they are built - the hurtbox is not always called "area2D", and
-# is often nested - so every CollisionShape2D underneath is collected and their
-# bounds unioned. Reading only one fixed path made most enemies fall back to a
-# zero-sized rect at their origin, which is why the saber only connected when
-# Zero was standing directly on top of them.
-# Never let a hurt box grow past this. Enemies own shapes far larger than their
-# bodies - detection ranges, attack reach - and sweeping those in made one
-# enemy read as 363px wide, which would have let the saber hit from most of a
-# screen away.
-const MAX_ENEMY_SIZE := Vector2(72, 72)
-
-func hurt_rect(enemy : Node2D) -> Rect2:
-	#The conventional hurtbox. Preferred when present, because it is the part of
-	#the enemy that is actually meant to be damageable.
-	var hurtbox = enemy.get_node_or_null("area2D")
-	var shapes := collision_shapes(hurtbox) if hurtbox != null else []
-	if shapes.empty():
-		shapes = collision_shapes(enemy)
-
-	var box := Rect2()
-	var found := false
-	for shape_node in shapes:
-		var extents := shape_extents(shape_node)
-		if extents == Vector2.ZERO:
+func masks_hit_receiver(mask_polygons : Array, receiver : Node) -> bool:
+	var area = receiver_hurtbox(receiver)
+	if area == null:
+		return false
+	for shape_node in collision_shapes(area):
+		var hurt_polygon := collision_polygon(shape_node)
+		if hurt_polygon.empty():
 			continue
-		var here := Rect2(shape_node.global_position - extents, extents * 2.0)
-		box = here if not found else box.merge(here)
-		found = true
-	if not found:
-		return Rect2(enemy.global_position - ASSUMED_ENEMY_SIZE * 0.5, ASSUMED_ENEMY_SIZE)
+		var hurt_bounds := polygon_bounds(hurt_polygon)
+		for mask_polygon in mask_polygons:
+			if not polygon_bounds(mask_polygon).intersects(hurt_bounds):
+				continue
+			if not Geometry.intersect_polygons_2d(mask_polygon, hurt_polygon).empty():
+				return true
+	return false
 
-	if box.size.x > MAX_ENEMY_SIZE.x or box.size.y > MAX_ENEMY_SIZE.y:
-		var clamped := Vector2(min(box.size.x, MAX_ENEMY_SIZE.x), min(box.size.y, MAX_ENEMY_SIZE.y))
-		box = Rect2(enemy.global_position - clamped * 0.5, clamped)
-	return box
+func receiver_hurtbox(receiver : Node):
+	if "custom_hitbox" in receiver and is_instance_valid(receiver.custom_hitbox):
+		return receiver.custom_hitbox
+	if "area2D" in receiver and is_instance_valid(receiver.area2D):
+		return receiver.area2D
+	var own_area = receiver.get_node_or_null("area2D")
+	if own_area != null:
+		return own_area
+	var owner = receiver.get_parent()
+	if owner != null:
+		return owner.get_node_or_null("area2D")
+	return null
 
-func collision_shapes(node : Node, out := []) -> Array:
+func collision_shapes(node : Node) -> Array:
+	var shapes := []
+	collect_collision_shapes(node, shapes)
+	return shapes
+
+func collect_collision_shapes(node : Node, out : Array) -> void:
 	for child in node.get_children():
 		if child is CollisionShape2D and not child.disabled and child.shape != null:
 			out.append(child)
+		elif child is CollisionPolygon2D and not child.disabled and not child.polygon.empty():
+			out.append(child)
 		if child.get_child_count() > 0:
-			collision_shapes(child, out)
-	return out
+			collect_collision_shapes(child, out)
 
-func shape_extents(shape_node : CollisionShape2D) -> Vector2:
+func collision_polygon(shape_node : Node2D) -> PoolVector2Array:
+	if shape_node is CollisionPolygon2D:
+		return transform_polygon(shape_node.polygon, shape_node.global_transform)
+
 	var shape = shape_node.shape
-	var scale : Vector2 = shape_node.global_scale.abs()
+	var local := PoolVector2Array()
 	if shape is RectangleShape2D:
-		return shape.extents * scale
-	if shape is CircleShape2D:
-		return Vector2(shape.radius, shape.radius) * scale
-	if shape is CapsuleShape2D:
-		return Vector2(shape.radius, shape.radius + shape.height * 0.5) * scale
-	return Vector2.ZERO
+		var e : Vector2 = shape.extents
+		local = PoolVector2Array([
+			Vector2(-e.x, -e.y), Vector2(e.x, -e.y),
+			Vector2(e.x, e.y), Vector2(-e.x, e.y),
+		])
+	elif shape is CircleShape2D:
+		local = circle_polygon(shape.radius)
+	elif shape is CapsuleShape2D:
+		local = capsule_polygon(shape.radius, shape.height)
+	elif shape is ConvexPolygonShape2D:
+		local = shape.points
+	return transform_polygon(local, shape_node.global_transform)
+
+func circle_polygon(radius : float, point_count := 24) -> PoolVector2Array:
+	var points := PoolVector2Array()
+	for index in range(point_count):
+		var angle := TAU * float(index) / float(point_count)
+		points.append(Vector2(cos(angle), sin(angle)) * radius)
+	return points
+
+func capsule_polygon(radius : float, height : float, point_count := 24) -> PoolVector2Array:
+	var points := PoolVector2Array()
+	var straight_half := max(0.0, height * 0.5 - radius)
+	for index in range(point_count):
+		var angle := TAU * float(index) / float(point_count)
+		var direction := Vector2(cos(angle), sin(angle))
+		var cap_offset := straight_half if direction.y >= 0.0 else -straight_half
+		points.append(Vector2(direction.x * radius, direction.y * radius + cap_offset))
+	return points
+
+func transform_polygon(polygon : PoolVector2Array, transform : Transform2D) -> PoolVector2Array:
+	var transformed := PoolVector2Array()
+	for point in polygon:
+		transformed.append(transform.xform(point))
+	return transformed
+
+func polygon_bounds(polygon : PoolVector2Array) -> Rect2:
+	if polygon.empty():
+		return Rect2()
+	var bounds := Rect2(polygon[0], Vector2.ZERO)
+	for index in range(1, polygon.size()):
+		bounds = bounds.expand(polygon[index])
+	return bounds
 
 # Damage is taken by the enemy's damage module, which owns its invulnerability
 # and reduction rules, so it is preferred over the root node.
@@ -365,6 +379,9 @@ func damage_receiver(enemy : Node):
 	for child in enemy.get_children():
 		if child.has_method("damage") and "active" in child and child.active:
 			return child
+	# Some EnemyDamage nodes add themselves to the group when their owner scene
+	# does not. Root Actor nodes also expose damage(), so this fallback must come
+	# after preferring their dedicated damage module above.
 	if enemy.has_method("damage"):
 		return enemy
 	return null
@@ -376,10 +393,8 @@ func damage_targets(data : Dictionary) -> void:
 	for target in targets:
 		if not is_instance_valid(target):
 			continue
-		#What arrives here is whatever the hurtbox passed to hit(), which for an
-		#enemy is its EnemyDamage node rather than the enemy root - so checking
-		#for the "Enemies" group would reject every real hit. Anything that can
-		#take damage exposes damage(); that is the actual contract.
+		# The receiver is normally EnemyDamage rather than the enemy root. Anything
+		# that can take damage exposes damage(); that is the actual contract.
 		if not target.has_method("damage"):
 			continue
 		if not can_hit_again(target, data):
@@ -428,7 +443,6 @@ func animation_length(anim : String) -> int:
 	return 0
 
 func _Interrupt() -> void:
-	park_hitbox()
 	targets.clear()
 	last_hit_step.clear()
 	play_end_animation()
@@ -455,13 +469,3 @@ func attack_just_pressed() -> bool:
 		if character.get_action_just_pressed(input):
 			return true
 	return false
-
-# Called by the SaberArea when a body enters or leaves it.
-func hit(body) -> void:
-	if not (body in targets):
-		targets.append(body)
-
-func leave(body) -> void:
-	if body in targets:
-		targets.erase(body)
-	last_hit_step.erase(body)

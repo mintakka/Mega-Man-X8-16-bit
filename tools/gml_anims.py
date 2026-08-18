@@ -7,9 +7,9 @@ A call looks like:
 
 The name is "animation|sprite" (sprite defaults to the animation name), the
 array is flat (time, image_index) pairs measured in 60fps game steps, and the
-trailing two optional arguments are the loop start/end times. The final pair is
-a sentinel marking the end of the last frame's duration rather than a frame to
-display, which is why durations are derived from the gaps between times.
+trailing one or two optional arguments are the inclusive loop start/end times.
+MMX-Next displays the final pair for one update before reporting animation_end;
+it is not merely a sentinel.
 """
 
 import argparse
@@ -54,6 +54,10 @@ def parse(path):
         pairs = list(zip(numbers[0::2], numbers[1::2]))
 
         loop = [int(n) for n in re.findall(r"-?\d+", trailing)]
+        # animation_add(name, frames, 4) means a one-step hold at t=4.  The GML
+        # helper expands the missing fourth argument to the same value.
+        if len(loop) == 1:
+            loop.append(loop[0])
 
         # Later definitions win: the character script is parsed after the shared
         # one and is meant to override it (player_zero_animations redefines
@@ -74,6 +78,8 @@ def parse(path):
             "borrows": source,
             "loop": [int(n) for n in re.findall(r"-?\d+", trailing)],
         }
+        if len(out[name]["loop"]) == 1:
+            out[name]["loop"].append(out[name]["loop"][0])
     return out
 
 
@@ -83,8 +89,17 @@ def expand(entry):
     if not pairs:
         return []
     frames = []
-    for i, (time, image) in enumerate(pairs[:-1]):
-        duration = pairs[i + 1][0] - time
+    for i, (time, image) in enumerate(pairs):
+        # animation_update() exposes the final key at its exact timestamp and
+        # only raises animation_end on the following update.
+        if i + 1 < len(pairs):
+            duration = pairs[i + 1][0] - time
+        elif len(entry.get("loop", [])) == 2:
+            # A loop may deliberately hold the last key beyond its timestamp,
+            # e.g. idle's final image starts at 168 and loops at 171.
+            duration = entry["loop"][1] - time + 1
+        else:
+            duration = 1
         frames.extend([image] * max(1, duration))
     return frames
 

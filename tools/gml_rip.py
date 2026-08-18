@@ -54,7 +54,7 @@ def find_sprite_folder(sprites_dirs, name):
 
 
 class Sprite:
-    def __init__(self, sprites_dir, name):
+    def __init__(self, sprites_dir, name, undefined_origin=None, default_origin=None):
         self.name = name
         folder = find_sprite_folder(sprites_dir, name)
         meta = load_yy(os.path.join(folder, name + ".yy"))
@@ -62,6 +62,14 @@ class Sprite:
         self.width = meta["width"]
         self.height = meta["height"]
         self.origin = (seq["xorigin"], seq["yorigin"])
+        # MMX-Next fixes sprites left at GameMaker's placeholder origin when it
+        # loads them.  Zero's X1 shooting set is one such family: every .yy says
+        # (0, 0), but player_load_sprites() replaces that with Zero's (61, 64).
+        # Applying the same rule while ripping keeps the alternate firing layer
+        # registered to the normal locomotion frames instead of 61px down/right.
+        if (undefined_origin is not None and default_origin is not None
+                and self.origin == undefined_origin):
+            self.origin = default_origin
         self.fps = seq.get("playbackSpeed", 15.0)
         self.images = []
         for guid in frame_order(meta):
@@ -134,7 +142,24 @@ def main():
     parser.add_argument("--out-index", required=True, help="JSON frame index for the .tres builder")
     parser.add_argument("--max-width", type=int, default=2048)
     parser.add_argument("--pad", type=int, default=1)
+    parser.add_argument("--undefined-origin",
+                        help="x,y origin which GameMaker replaces at load time")
+    parser.add_argument("--default-origin",
+                        help="x,y replacement for --undefined-origin")
     args = parser.parse_args()
+
+    def parse_point(raw, option):
+        if raw is None:
+            return None
+        values = [int(v.strip()) for v in raw.split(",")]
+        if len(values) != 2:
+            parser.error("%s must be x,y" % option)
+        return tuple(values)
+
+    undefined_origin = parse_point(args.undefined_origin, "--undefined-origin")
+    default_origin = parse_point(args.default_origin, "--default-origin")
+    if (undefined_origin is None) != (default_origin is None):
+        parser.error("--undefined-origin and --default-origin must be used together")
 
     names = [n.strip() for n in args.names.split(",") if n.strip()]
     sprites = []
@@ -142,7 +167,7 @@ def main():
         if find_sprite_folder(args.sprites_dir, name) is None:
             print("missing sprite: " + name, file=sys.stderr)
             return 1
-        sprites.append(Sprite(args.sprites_dir, name))
+        sprites.append(Sprite(args.sprites_dir, name, undefined_origin, default_origin))
 
     # Every frame is first placed on one shared canvas with all origins on the
     # same spot. Sprites disagree on both canvas size and origin - Raikousen is

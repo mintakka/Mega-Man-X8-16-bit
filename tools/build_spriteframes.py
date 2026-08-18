@@ -32,6 +32,10 @@ def main():
     parser.add_argument("--alias", default="",
                         help="godot=gml pairs, so Zero answers to the same animation "
                              "names X's ability nodes already drive (damage=dolor2)")
+    parser.add_argument("--sprite-map", default="",
+                        help="gml_sprite=replacement_sprite pairs for alternate layers")
+    parser.add_argument("--resource-name", default="",
+                        help="optional Godot resource_name (used to identify layers)")
     parser.add_argument("--out", required=True)
     args = parser.parse_args()
 
@@ -44,6 +48,13 @@ def main():
     for pair in filter(None, (p.strip() for p in args.alias.split(","))):
         godot_name, _, gml_name = pair.partition("=")
         alias[godot_name] = gml_name
+
+    sprite_map = {}
+    for pair in filter(None, (p.strip() for p in args.sprite_map.split(","))):
+        source_name, separator, replacement = pair.partition("=")
+        if not separator:
+            parser.error("--sprite-map entries must be source=replacement")
+        sprite_map[source_name] = replacement
 
     wanted = [n.strip() for n in args.only.split(",")] if args.only else sorted(anims)
 
@@ -64,7 +75,8 @@ def main():
         if entry is None:
             skipped.append((name, "no animation table"))
             continue
-        sprite, steps, loop = entry["sprite"], entry["frames"], entry["loop"]
+        sprite = sprite_map.get(entry["sprite"], entry["sprite"])
+        steps, loop = entry["frames"], entry["loop"]
         sprite_entry = index["sprites"].get(args.prefix + sprite)
         if sprite_entry is None:
             skipped.append((name, "sprite %s not in atlas" % (args.prefix + sprite)))
@@ -88,8 +100,9 @@ def main():
         ranged = len(loop) == 2 and loop[0] > 0
         built.append((name, ids, len(loop) == 2 and loop[0] == 0))
         if ranged:
-            start, end = loop[0], min(loop[1], len(ids))
-            tail = ids[start:end]
+            start, end = loop[0], min(loop[1], len(ids) - 1)
+            # MMX-Next's animation loop endpoints are inclusive.
+            tail = ids[start:end + 1]
             if tail:
                 built.append((name + "_loop", tail, True))
 
@@ -110,6 +123,8 @@ def main():
         lines.append("")
 
     lines.append("[resource]")
+    if args.resource_name:
+        lines.append('resource_name = "%s"' % args.resource_name.replace('"', '\\"'))
     entries = []
     for name, ids, loop in built:
         frames = ", ".join("SubResource( %d )" % i for i in ids)

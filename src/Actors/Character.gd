@@ -257,7 +257,19 @@ func has_just_pressed_right() -> bool:
 
 func set_animation_layer (layer):
 	if animatedSprite.frames != layer:
+		# Shooting layers are alternate art for the current locomotion state, not a
+		# new animation. Preserve the timeline when swapping resources; assigning
+		# SpriteFrames resets AnimatedSprite to frame zero and used to restart
+		# walk_start both when firing and when lowering the buster.
+		var current_animation : String = animatedSprite.animation
+		var current_frame : int = animatedSprite.frame
+		var was_playing : bool = animatedSprite.playing
 		animatedSprite.frames = layer
+		if layer.has_animation(current_animation):
+			animatedSprite.animation = current_animation
+			var last_frame : int = max(0, layer.get_frame_count(current_animation) - 1)
+			animatedSprite.frame = min(current_frame, last_frame)
+			animatedSprite.playing = was_playing
 		
 func get_animation_layer () -> String:
 	return animatedSprite.frames

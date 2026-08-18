@@ -16,7 +16,10 @@ spr_zero_atk_jump,spr_zero_atk_land,spr_zero_atk_wall,spr_zero_intro,\
 spr_zero_teleport,spr_zero_outro,spr_zero_atk_ryuenjin,\
 spr_zero_atk_hyouretsuzan,spr_zero_atk_raikousen,spr_zero_atk_raikousen_air,\
 spr_zero_atk_shippuuga,spr_zero_messenko,spr_zero_atk_mikazukizan,\
-spr_zero_buster,spr_zero_ride_armor"
+spr_zero_ride_armor,\
+spr_zero_shoot_x1,spr_zero_walk_shoot_x1,spr_zero_jump_shoot_x1,\
+spr_zero_dash_shoot_x1,spr_zero_crouch_shoot_x1,\
+spr_zero_crouch_alt_shoot_x1,spr_zero_wall_shoot_x1"
 
 # Godot-facing name = GML name, so Zero answers to the animation names the
 # existing ability nodes already drive.
@@ -25,17 +28,26 @@ spr_zero_buster,spr_zero_ride_armor"
 # teleport-in and intro poses and the intro plays through unchanged.
 # beam/beam_in/beam_equip come from zero_intro.gml, which splits his own intro
 # sprite into the three stages the Intro module drives.
-# `recover` is only ever played in response to the shot layer toggling, i.e.
-# while shooting, so for Zero it maps to his buster pose rather than his idle.
-# Idle plays it synchronously from inside enable_animation_layer, which is what
-# was overwriting the firing pose and leaving shots coming out of a standing
-# idle.
 ALIAS="damage=dolor2,slide=wall_slide,walljump=wall_jump,\
-shot=buster,\
-recover=buster,victory=complete,walk_start=walk,weak=critical,damage_resist=dolor2,\
+shot=idle,\
+recover=idle,victory=complete,walk_start=walk,weak=critical,damage_resist=dolor2,\
 ride=ride_armor,boost=ride_armor,boost_start=ride_armor,boost_end=ride_armor,\
 wheelie=ride_armor,wheelie_end=ride_armor,break=ride_armor,break_end=ride_armor,\
 stop=ride_armor,stop_end=ride_armor,turn=ride_armor"
+
+# MMX-Next's X1 Zero has complete full-body shooting variants.  Its animation
+# controller keeps the same animation name/timeline and swaps the sprite source
+# while `shoot` is true.  That is the direct equivalent of this project's X arm
+# layer, so build a second SpriteFrames resource with those source substitutions.
+SHOOT_ALIAS="damage=dolor2,slide=wall_slide,walljump=wall_jump,\
+shot=shoot,recover=shoot,victory=complete,walk_start=walk,weak=critical,\
+damage_resist=dolor2,ride=ride_armor,boost=ride_armor,\
+boost_start=ride_armor,boost_end=ride_armor,wheelie=ride_armor,\
+wheelie_end=ride_armor,break=ride_armor,break_end=ride_armor,\
+stop=ride_armor,stop_end=ride_armor,turn=ride_armor"
+
+SHOOT_SPRITES="shoot=shoot_x1,walk=walk_shoot_x1,jump=jump_shoot_x1,\
+dash=dash_shoot_x1,crouch=crouch_shoot_x1,wall=wall_shoot_x1"
 
 ANIMS="idle,walk,jump,fall,land,dash,dash_end,slide,walljump,crouch,crouch_end,\
 damage,intro,teleport,outro,atk_1,atk_1_end,atk_2,atk_2_end,atk_3,atk_3_end,\
@@ -53,6 +65,8 @@ python3 tools/gml_rip.py \
 	--names "$SPRITES" \
 	--out-png "$OUT/zero.png" \
 	--out-index "$WORK/index.json" \
+	--undefined-origin 0,0 \
+	--default-origin 61,64 \
 	--max-width 2048
 
 python3 tools/gml_anims.py \
@@ -69,3 +83,19 @@ python3 tools/build_spriteframes.py \
 	--alias "$ALIAS" \
 	--only "$ANIMS" \
 	--out "$OUT/zero.tres"
+
+python3 tools/build_spriteframes.py \
+	--index "$WORK/index.json" \
+	--anims "$WORK/anims.json" \
+	--atlas "$OUT/zero.png" \
+	--prefix "spr_zero_" \
+	--alias "$SHOOT_ALIAS" \
+	--sprite-map "$SHOOT_SPRITES" \
+	--resource-name "pointing_cannon" \
+	--only "$ANIMS" \
+	--out "$OUT/zero_shoot.tres"
+
+python3 tools/build_zero_saber_masks.py \
+	--sprites-dir "$MMX_NEXT/sprites" \
+	--anims "$WORK/anims.json" \
+	--out "$OUT/saber_masks.gd"

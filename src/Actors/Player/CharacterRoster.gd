@@ -30,6 +30,14 @@ const select_frames := {
 	AXL: "",
 }
 
+# Optional full-body firing layers. X composes a separate arm layer, while
+# MMX-Next's X1 Zero supplies complete firing variants for each locomotion pose.
+const shoot_frames := {
+	X: "",
+	ZERO: "res://src/Actors/Player/zero_sprites/zero_shoot.tres",
+	AXL: "",
+}
+
 # The ride armour draws its pilot as its own sprite inside the cockpit, so a
 # character without one visibly turns back into X the moment they mount.
 const pilot_frames := {
@@ -61,6 +69,9 @@ static func get_display_name(id : String) -> String:
 
 static func get_select_frames(id : String) -> String:
 	return select_frames.get(id, "")
+
+static func get_shoot_frames(id : String) -> String:
+	return shoot_frames.get(id, "")
 
 #Left-to-right order on the select screen. X sits in the middle because he is
 #the default and the only character with the armor and weapon systems. The

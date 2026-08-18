@@ -1,9 +1,8 @@
-[gd_scene load_steps=139 format=2]
+[gd_scene load_steps=137 format=2]
 
 [ext_resource path="res://src/Actors/Player/x_sprites/x.res" type="SpriteFrames" id=1]
 [ext_resource path="res://src/Actors/Player.gd" type="Script" id=2]
 [ext_resource path="res://src/Actors/Player/ZeroSaber.gd" type="Script" id=120]
-[ext_resource path="res://src/Actors/Player/SaberHitbox.gd" type="Script" id=121]
 [ext_resource path="res://src/Actors/Player/zero_sprites/zero.tres" type="SpriteFrames" id=122]
 [ext_resource path="res://src/Sounds/zero_saber_1.wav" type="AudioStream" id=123]
 [ext_resource path="res://src/Sounds/zero_saber_2.wav" type="AudioStream" id=124]
@@ -184,9 +183,6 @@ particles_animation = true
 particles_anim_h_frames = 2
 particles_anim_v_frames = 2
 particles_anim_loop = false
-
-[sub_resource type="RectangleShape2D" id=60]
-extents = Vector2( 14, 12 )
 
 [node name="X" type="KinematicBody2D" groups=["Player"]]
 z_index = 2
@@ -1144,13 +1140,3 @@ saber_sound_hyouretsuzan = ExtResource( 126 )
 volume_db = -6.0
 max_distance = 600.0
 bus = "SFX"
-
-[node name="SaberArea" type="KinematicBody2D" parent="Saber" groups=["Player Projectile"]]
-visible = false
-collision_layer = 4
-collision_mask = 0
-script = ExtResource( 121 )
-
-[node name="collisionShape2D" type="CollisionShape2D" parent="Saber/SaberArea"]
-shape = SubResource( 60 )
-disabled = true
