@@ -71,10 +71,9 @@ func picked_stage(stage : StageInfo) -> void:
 	Tools.timer_p(2.5,"on_fadeout_finished",self,stage)
 
 func on_fadeout_finished(stage : StageInfo) -> void:
-	if stage.should_play_stage_intro():
-		GameManager.go_to_stage_intro(stage)
-	else:
-		GameManager.start_level(stage.get_load_name())
+	#The character select decides where to go next - it resumes this same
+	#branch once a character has been chosen.
+	GameManager.go_to_character_select(stage)
 
 func fade_out() -> void:
 	fader.color = Color(0,0,0,0)

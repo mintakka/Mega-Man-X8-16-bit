@@ -37,7 +37,7 @@ def main():
 
     index = json.load(open(args.index))
     anims = json.load(open(args.anims))
-    cell_w, cell_h = index["cell"]
+    canvas_w, canvas_h = index["canvas"]
 
     # Godot-facing name -> GML animation name.
     alias = {}
@@ -51,7 +51,7 @@ def main():
     regions = {}
     def region_id(sprite, image):
         entry = index["sprites"].get(args.prefix + sprite)
-        if entry is None or image >= len(entry["regions"]):
+        if entry is None or image >= len(entry["frames"]):
             return None
         key = (sprite, image)
         if key not in regions:
@@ -89,11 +89,16 @@ def main():
     lines.append('[ext_resource path="%s" type="Texture" id=1]' % godot_path(args.atlas))
     lines.append("")
     for (sprite, image), rid in sorted(regions.items(), key=lambda kv: kv[1]):
-        x, y, w, h = index["sprites"][args.prefix + sprite]["regions"][image]
+        frame = index["sprites"][args.prefix + sprite]["frames"][image]
+        x, y, w, h = frame["region"]
+        mx, my, mw, mh = frame["margin"]
         lines.append('[sub_resource type="AtlasTexture" id=%d]' % rid)
         lines.append("flags = 4")           # filter off, pixel art stays crisp
         lines.append("atlas = ExtResource( 1 )")
         lines.append("region = Rect2( %d, %d, %d, %d )" % (x, y, w, h))
+        # Re-inflates the trimmed frame back to the shared canvas, so every
+        # frame reports the same size and the sprite never shifts between them.
+        lines.append("margin = Rect2( %d, %d, %d, %d )" % (mx, my, mw, mh))
         lines.append("")
 
     lines.append("[resource]")
@@ -107,9 +112,9 @@ def main():
     open(args.out, "w").write("\n".join(lines) + "\n")
 
     print("wrote %s" % args.out)
-    print("  animations: %d   atlas regions: %d   cell: %dx%d"
-          % (len(built), len(regions), cell_w, cell_h))
-    print("  origin in cell: %s" % (index["origin"],))
+    print("  animations: %d   atlas regions: %d   canvas: %dx%d"
+          % (len(built), len(regions), canvas_w, canvas_h))
+    print("  origin on canvas: %s" % (index["origin"],))
     for name, _ in skipped:
         pass
     if skipped:

@@ -19,6 +19,15 @@ const scenes := {
 	AXL: "res://src/Actors/Player_Axl.tscn",
 }
 
+# Idle animations for the select screen. These are the same SpriteFrames the
+# character plays in-game, so the preview is always the real sprite rather than
+# a portrait that could drift out of date.
+const select_frames := {
+	X: "res://src/Actors/Player/x_sprites/x.res",
+	ZERO: "res://src/Actors/Player/zero_sprites/zero.tres",
+	AXL: "",
+}
+
 const display_names := {
 	X: "X",
 	ZERO: "ZERO",
@@ -39,6 +48,9 @@ static func get_scene_path(id : String) -> String:
 
 static func get_display_name(id : String) -> String:
 	return display_names.get(id, display_names[DEFAULT])
+
+static func get_select_frames(id : String) -> String:
+	return select_frames.get(id, "")
 
 static func get_ids() -> Array:
 	return [X, ZERO, AXL]

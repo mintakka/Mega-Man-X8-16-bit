@@ -13,15 +13,24 @@ trap 'rm -rf "$WORK"' EXIT
 SPRITES="spr_zero_idle,spr_zero_walk,spr_zero_jump,spr_zero_dash,spr_zero_wall,\
 spr_zero_crouch,spr_zero_dolor2,spr_zero_atk_1,spr_zero_atk_2,spr_zero_atk_3,\
 spr_zero_atk_jump,spr_zero_atk_land,spr_zero_atk_wall,spr_zero_intro,\
-spr_zero_teleport,spr_zero_outro"
+spr_zero_teleport,spr_zero_outro,spr_zero_atk_ryuenjin,\
+spr_zero_atk_hyouretsuzan,spr_zero_atk_raikousen,spr_zero_atk_raikousen_air,\
+spr_zero_atk_shippuuga,spr_zero_messenko"
 
 # Godot-facing name = GML name, so Zero answers to the animation names the
 # existing ability nodes already drive.
-ALIAS="damage=dolor2,slide=wall_slide,walljump=wall_jump"
+# The shared Intro module drives beam/beam_in/beam_equip, which are X's
+# armour-beam animations. Zero has no armour, so they map onto his own
+# teleport-in and intro poses and the intro plays through unchanged.
+ALIAS="damage=dolor2,slide=wall_slide,walljump=wall_jump,\
+beam=teleport,beam_in=intro,beam_equip=intro"
 
 ANIMS="idle,walk,jump,fall,land,dash,dash_end,slide,walljump,crouch,crouch_end,\
 damage,intro,teleport,outro,atk_1,atk_1_end,atk_2,atk_2_end,atk_3,atk_3_end,\
-atk_jump,atk_jump_end,atk_land,atk_land_end,atk_wall,atk_wall_end"
+atk_jump,atk_jump_end,atk_land,atk_land_end,atk_wall,atk_wall_end,\
+atk_ryuenjin,atk_ryuenjin_end,atk_hyouretsuzan,atk_hyouretsuzan_end,\
+atk_raikousen,atk_raikousen_air,atk_shippuuga,atk_shippuuga_end,messenko,\
+beam,beam_in,beam_equip"
 
 mkdir -p "$OUT"
 
@@ -30,7 +39,7 @@ python3 tools/gml_rip.py \
 	--names "$SPRITES" \
 	--out-png "$OUT/zero.png" \
 	--out-index "$WORK/index.json" \
-	--columns 12
+	--max-width 2048
 
 python3 tools/gml_anims.py \
 	"$MMX_NEXT/scripts/player_animations/player_animations.gml" \

@@ -350,6 +350,27 @@ func go_to_weapon_get() -> void:
 	call_deferred("force_unpause")
 	call_deferred("on_level_start")
 
+#The stage select hands off here instead of straight into the stage, so the
+#player picks a character first. The stage is remembered rather than passed
+#through the select screen, which keeps that screen from needing to know
+#anything about stage routing.
+func go_to_character_select(stage : StageInfo) -> void:
+	print_debug(":::::::: going to character select")
+	current_stage_info = stage
+	var _dv = get_tree().change_scene("res://src/CharacterSelect/CharacterSelectScreen.tscn")
+
+#Resumes exactly what the stage select would have done had the character select
+#not been in the way.
+func continue_after_character_select() -> void:
+	var stage := current_stage_info
+	if stage == null:
+		go_to_stage_select()
+		return
+	if stage.should_play_stage_intro():
+		go_to_stage_intro(stage)
+	else:
+		start_level(stage.get_load_name())
+
 func go_to_stage_intro(stage : StageInfo) -> void:
 	print_debug(":::::::: going to stage and boss intro")
 	current_stage_info = stage

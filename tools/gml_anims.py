@@ -19,6 +19,14 @@ import sys
 
 CALL = re.compile(r"animation_add\s*\(\s*\"([^\"]+)\"\s*,\s*\[([^\]]*)\]\s*((?:,\s*-?\d+\s*)*)\)")
 
+# Some animations borrow another animation's timing wholesale instead of
+# repeating the table, e.g. the airborne Raikousen:
+#   animation_add("atk_raikousen_air", animations_frames[? "atk_raikousen"]);
+# The sprite still defaults to the animation's own name, so this reuses the
+# timing against a different sprite.
+REF = re.compile(r"animation_add\s*\(\s*\"([^\"]+)\"\s*,\s*"
+                 r"animations_frames\[\?\s*\"([^\"]+)\"\s*\]\s*((?:,\s*-?\d+\s*)*)\)")
+
 
 def strip_comments(text):
     text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
@@ -46,6 +54,16 @@ def parse(path):
         # one and is meant to override it (player_zero_animations redefines
         # "jump", "dash" and friends on top of player_animations).
         out[name] = {"sprite": sprite, "keyframes": pairs, "loop": loop}
+
+    for match in REF.finditer(text):
+        raw_name, source, trailing = match.group(1), match.group(2), match.group(3)
+        name, _, sprite = raw_name.partition("|")
+        sprite = sprite or name
+        out[name] = {
+            "sprite": sprite,
+            "borrows": source,
+            "loop": [int(n) for n in re.findall(r"-?\d+", trailing)],
+        }
     return out
 
 
@@ -70,6 +88,28 @@ def main():
     merged = {}
     for path in args.files:
         merged.update(parse(path))
+
+    # Resolve borrowed timing tables. Looping until nothing changes handles a
+    # borrow whose source is itself a borrow, in any file order.
+    for _ in range(len(merged) + 1):
+        progressed = False
+        for entry in merged.values():
+            source = entry.get("borrows")
+            if source is None:
+                continue
+            donor = merged.get(source)
+            if donor is None or "keyframes" not in donor:
+                continue
+            entry["keyframes"] = donor["keyframes"]
+            entry.pop("borrows")
+            progressed = True
+        if not progressed:
+            break
+
+    for name, entry in list(merged.items()):
+        if "keyframes" not in entry:
+            print("unresolved borrow in %s, dropping" % name, file=sys.stderr)
+            del merged[name]
 
     for name, entry in merged.items():
         entry["frames"] = expand(entry)
