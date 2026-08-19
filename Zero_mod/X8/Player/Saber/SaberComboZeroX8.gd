@@ -16,7 +16,9 @@ func hitbox_and_position():
 			hitbox_damage_boss = damage_boss
 			hitbox_damage_weakness = damage_weakness
 			hitbox_rehit_time = 0.1
-			hitbox_break_guards = false
+			# Base Zero's standard saber should open low-tier guards on the
+			# first swing, matching his close-range combat tuning.
+			hitbox_break_guards = true
 			if animatedSprite.frame >= 2 and animatedSprite.frame < 4:
 				hitbox_upleft = Vector2( - 5, - 42)
 				hitbox_downright = Vector2(72, 14)
@@ -84,7 +86,7 @@ func hitbox_and_position():
 			hitbox_damage_boss = 6
 			hitbox_damage_weakness = 24
 			hitbox_rehit_time = 0.1
-			hitbox_break_guards = false
+			hitbox_break_guards = true
 			if animatedSprite.frame >= 2 and animatedSprite.frame < 3:
 				hitbox_upleft = Vector2( - 5, - 20)
 				hitbox_downright = Vector2(65, 10)

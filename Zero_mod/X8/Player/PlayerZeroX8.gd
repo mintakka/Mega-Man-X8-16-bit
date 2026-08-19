@@ -7,7 +7,10 @@ onready var lowjumpcast: Label = $lowjumpcast
 onready var saber_node = get_node("Shot")
 onready var ability_animation: Resource = preload("res://Zero_mod/X8/Sprites/BossAbilities/ability_effects.tres")
 
-onready var _saber_sprites: Resource = preload("res://Zero_mod/X8/Sprites/zerox8.tres")
+const NATIVE_SABER_SPRITES := preload("res://Zero_mod/X8/Sprites/zerox8.tres")
+const USER_SABER_SPRITES := preload("res://Zero_mod/X8/Sprites/Custom/zerox8_hybrid.tres")
+
+onready var _saber_sprites: Resource = NATIVE_SABER_SPRITES
 onready var _fan_sprites: Resource = preload("res://Zero_mod/X8/Sprites/bfan/bfan.tres")
 onready var _glaive_sprites: Resource = preload("res://Zero_mod/X8/Sprites/dglaive/dglaive.tres")
 onready var _knuckle_sprites: Resource = preload("res://Zero_mod/X8/Sprites/kknuckle/zerox8knuckle.tres")
@@ -224,6 +227,12 @@ func increase_hitbox() -> void :
 	collisor.disabled = false
 
 func _ready() -> void :
+	# Base Zero uses the user's preferred MMX-Next locomotion and saber art.
+	# Palette variants retain Zashiko's native sheet because their replacement
+	# shader is authored against that exact palette. The hybrid resource itself
+	# also retains all of Zashiko's rides, techniques and scripted animations.
+	_saber_sprites = USER_SABER_SPRITES if uses_user_zero_art() else NATIVE_SABER_SPRITES
+	animatedSprite.frames = _saber_sprites
 	current_armor = ["no_head", "no_body", "no_arms", "no_legs"]
 	Event.listen("collected", self, "equip_parts")
 	Event.listen("collected", self, "collect")
@@ -238,11 +247,15 @@ func _ready() -> void :
 
 func change_ride_chaser_sprites() -> void :
 	var _texture = load("res://Zero_mod/X8/Sprites/zero_ride_chaser.png")
-	var _reference_frames = load("res://Zero_mod/X8/Sprites/zerox8.tres")
 	var _replace_animations = [
 		"empty", 
 	]
-	animatedSprite.frames = CharacterManager.update_texture_specific_animations(_texture, _reference_frames, _replace_animations)
+	animatedSprite.frames = CharacterManager.update_texture_specific_animations(_texture, _saber_sprites, _replace_animations)
+
+func uses_user_zero_art() -> bool:
+	return not CharacterManager.black_zero_armor \
+		and not CharacterManager.nightshade_zero_armor \
+		and not CharacterManager.custom_zero_armor
 
 func get_armor_sprites() -> Array:
 	var sprites = []

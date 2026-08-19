@@ -101,7 +101,7 @@ func hitbox_and_position():
 		hitbox_damage_boss = damage_boss
 		hitbox_damage_weakness = damage_weakness
 		hitbox_break_guard_value = 0.25
-		hitbox_break_guards = false
+		hitbox_break_guards = true
 		if animatedSprite.frame >= 2 and animatedSprite.frame < 4:
 			hitbox_upleft = Vector2(0, - 40)
 			hitbox_downright = Vector2(61, 17)

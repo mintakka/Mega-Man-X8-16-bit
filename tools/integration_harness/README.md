@@ -8,4 +8,15 @@ godot3.5 --path . --no-window tools/integration_harness/NativeCharacterBootTest.
 godot3.5 --path . --no-window tools/integration_harness/IntegrationBehaviorTest.tscn
 godot3.5 --path . --no-window tools/integration_harness/SaveMigrationTest.tscn
 godot3.5 --path . --no-window tools/integration_harness/CampaignResourceMatrixTest.tscn
+godot3.5 --path . --no-window tools/integration_harness/HybridZeroSpriteTest.tscn
+godot3.5 --path . --no-window tools/integration_harness/MissionCharacterPickerTest.tscn
+godot3.5 --path . --no-window tools/integration_harness/ZeroGuardTuningTest.tscn
 ```
+
+`BuildHybridZeroFrames.gd` regenerates the base-Zero hybrid SpriteFrames from
+the user's MMX-Next source sheet while retaining Zashiko's animation contract.
+Run it as `BuildHybridZeroFrames.tscn` after changing the source definitions.
+
+`ZeroGuardTuningTest.tscn` protects Zero's innate knockback resistance and
+confirms his standard ground, jumping, and wall saber attacks stagger a hiding
+Metool before defeating it once exposed.

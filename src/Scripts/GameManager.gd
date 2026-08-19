@@ -47,6 +47,7 @@ var true_delta: float = 0.0
 #Life System
 const player_life_count: String = "player_lives"
 var current_stage_info
+var pending_character_select_stage
 
 var time_attack:= false
 var ta_status := "Recording..."
@@ -329,8 +330,35 @@ func handle_player_death() -> void :
 		fill_subtanks()
 
 func go_to_stage_select() -> void :
+	pending_character_select_stage = null
 	var _dv = get_tree().change_scene("res://src/StageSelect/StageSelectScreen.tscn")
 	IGT.set_timer_running(true)
+
+# Stage Select queues the mission here before opening Zashiko's full character
+# carousel. The selected character is committed only when the player confirms;
+# cancelling simply returns to the map without changing campaign progress.
+func choose_character_for_stage(stage) -> void:
+	pending_character_select_stage = stage
+	IGT.set_timer_running(false)
+	var _dv = get_tree().change_scene("res://System/Screens/CharacterSelection/Character_Selection.tscn")
+
+func has_pending_character_select_stage() -> bool:
+	return pending_character_select_stage != null
+
+func cancel_character_select_stage() -> void:
+	pending_character_select_stage = null
+	go_to_stage_select()
+
+func start_pending_character_select_stage() -> void:
+	var stage = pending_character_select_stage
+	pending_character_select_stage = null
+	if stage == null:
+		go_to_stage_select()
+		return
+	if stage.should_play_stage_intro():
+		go_to_stage_intro(stage)
+	else:
+		start_level(stage.get_load_name())
 
 func go_to_weapon_get() -> void :
 	if CharacterManager.player_character == "X":

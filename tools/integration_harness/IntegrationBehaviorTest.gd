@@ -49,6 +49,13 @@ func _ready() -> void:
 		check("character." + move + ".damage = 6" in saber_source, move + " does not one-hit ordinary low-tier enemies")
 		check("character." + move + ".hitbox_break_guards = true" in saber_source, move + " does not open breakable guards")
 
+	var stage_select_source := read_text("res://src/StageSelect/StageSelectUI.gd")
+	var character_select_source := read_text("res://System/Screens/CharacterSelection/Character_Selection.gd")
+	var character_start_source := read_text("res://System/Screens/CharacterSelection/GameStart.gd")
+	check("GameManager.choose_character_for_stage(stage)" in stage_select_source, "Missions bypass the character picker")
+	check("GameManager.cancel_character_select_stage()" in character_select_source, "Mission picker cannot return to Stage Select")
+	check("GameManager.start_pending_character_select_stage()" in character_start_source, "Mission picker does not launch the queued stage")
+
 	finish()
 
 func finish() -> void:

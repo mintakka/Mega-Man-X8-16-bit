@@ -109,7 +109,7 @@ func hitbox_and_position() -> void :
 		hitbox_damage_boss = damage_boss
 		hitbox_damage_weakness = damage_weakness
 		hitbox_rehit_time = 0.25
-		hitbox_break_guards = false
+		hitbox_break_guards = true
 		if animatedSprite.animation == "saber_jump":
 			if animatedSprite.frame >= 3 and animatedSprite.frame < 5:
 				hitbox_upleft = Vector2( - 29, - 51)

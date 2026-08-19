@@ -35,7 +35,10 @@ func end() -> void :
 	lock_buttons()
 	fader.FadeOut()
 	yield(fader, "finished")
-	GameManager.go_to_intro()
+	if GameManager.has_pending_character_select_stage():
+		GameManager.cancel_character_select_stage()
+	else:
+		GameManager.go_to_intro()
 	emit_signal("end")
 	active = false
 

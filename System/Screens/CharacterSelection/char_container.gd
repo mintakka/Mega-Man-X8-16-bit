@@ -69,13 +69,21 @@ func _ready() -> void :
 	characters = get_children()
 	for child in characters:
 		child.rect_min_size = Vector2(40, 48)
+	center_current_character()
 	set_menu_visibility()
 
-	CharacterManager.black_zero_armor = false
 	CharacterManager.set_zeroX8_colors(sprite_zero)
-
-	CharacterManager.white_axl_armor = false
 	CharacterManager.set_axl_colors(sprite_axl)
+
+# The new-game picker historically centered X every time. Mission deployment
+# instead opens on the currently selected hunter so confirming the same choice
+# is a single button press, while preserving the polished carousel behavior.
+func center_current_character() -> void:
+	if CharacterManager.player_character == "Axl":
+		move_child(get_node("Zero"), 0)
+	elif CharacterManager.player_character == "Zero":
+		move_child(get_node("Axl"), get_child_count() - 1)
+	characters = get_children()
 
 func hide_all_wireframes() -> void :
 	wireframe_x.hide()
