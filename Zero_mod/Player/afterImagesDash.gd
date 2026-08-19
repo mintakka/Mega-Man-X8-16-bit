@@ -75,7 +75,8 @@ func check_horizontal_velocity(state: String) -> bool:
 func set_shader_colors():
 	var material = original.get_material()
 	if material is ShaderMaterial:
-		initial_color = material.get_shader_param("R_SaberColor4")
+		var saber_color = material.get_shader_param("R_SaberColor4")
+		initial_color = saber_color if typeof(saber_color) == TYPE_COLOR else Color("#00000000")
 		final_color = Color("#00000000")
 	elif material is CanvasItemMaterial:
 		initial_color = Color("#00000000")

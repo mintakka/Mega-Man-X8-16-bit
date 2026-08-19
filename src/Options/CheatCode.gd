@@ -25,9 +25,6 @@ func _ready() -> void:
 	digits.resize(GameManager.cheat_code_length)
 	for i in digits.size():
 		digits[i] = 0
-	# X8Menu decides here whether this is a debug run or a real submenu, so the
-	# base _ready still has to happen.
-	._ready()
 	refresh()
 
 #The screen is driven entirely by _input rather than focusable buttons, so there

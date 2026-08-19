@@ -36,8 +36,10 @@ func _ready() -> void :
 func set_shader_colors():
 	var material = original.get_material()
 	if material is ShaderMaterial:
-		initial_color = material.get_shader_param("R_MainColor1")
-		final_color = material.get_shader_param("R_RedColor2")
+		var main_color = material.get_shader_param("R_MainColor1")
+		var red_color = material.get_shader_param("R_RedColor2")
+		initial_color = main_color if typeof(main_color) == TYPE_COLOR else Color("#00000000")
+		final_color = red_color if typeof(red_color) == TYPE_COLOR else Color("#00000000")
 
 func _process(_delta):
 	if upgraded:

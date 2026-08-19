@@ -131,6 +131,21 @@ stream = ExtResource( 46 )
 volume_db = -4.0
 bus = "SFX"
 
+[node name="equip" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 46 )
+volume_db = -4.0
+bus = "SFX"
+
+[node name="pick" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 46 )
+volume_db = -4.0
+bus = "SFX"
+
+[node name="cancel" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 46 )
+volume_db = -4.0
+bus = "SFX"
+
 [node name="Fader" type="ColorRect" parent="."]
 margin_right = 398.0
 margin_bottom = 224.0

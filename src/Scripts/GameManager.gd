@@ -254,13 +254,6 @@ func go_to_igt() -> void:
 	var _dv = get_tree().change_scene("res://src/Screens/IGTScreen.tscn")
 	GameManager.call_deferred("restart_level")
 
-func go_to_lumine_boss_test() -> void:
-	print_debug(":::::::: going to seraph lumine boss test")
-	var _dv = get_tree().change_scene("res://src/Levels/SigmaPalace/SeraphTest.tscn")
-	GameManager.checkpoint = null
-	GameManager.call_deferred("restart_level")
-	
-
 func end_level():
 	Event.emit_signal("fade_out")
 	end_stage_timer = 0.01
