@@ -135,6 +135,10 @@ func has_ultimate_armor() -> bool:
 	return part == 4
 
 func start() -> void :
+	# Embedded menus are reusable. Ignore a second activation while the current
+	# fade is live so one input cannot create overlapping tween/yield states.
+	if active or fader.transitioning:
+		return
 	GameManager.set_stretch_mode(SceneTree.STRETCH_MODE_2D)
 	set_visible_elements()
 	emit_signal("initialize")
@@ -156,6 +160,11 @@ func give_focus() -> void :
 	focus.grab_focus()
 
 func end() -> void :
+	# Correct-code auto-close and the back button can arrive in the same window.
+	# A second end() used to kill the first fade tween and leave its coroutine
+	# attached to a scene that was later freed, which can fatally crash Godot 3.5.
+	if not active or locked or fader.transitioning:
+		return
 	play_cancel_sound()
 	lock_buttons()
 	fader.FadeOut()

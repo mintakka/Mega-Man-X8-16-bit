@@ -1,6 +1,5 @@
 extends DashJump
 
-onready var airdash = character.get_node("AirDash")
 var max_air_jumps: = 0
 var current_air_jumps: = 0
 onready var jump_particle = get_node("jump_particle")
@@ -13,13 +12,10 @@ func _ready() -> void :
 		character.listen("ride", self, "reset_jump_count")
 		character.listen("wallslide", self, "reset_jump_count")
 		character.listen("walljump", self, "reset_jump_count")
-		character.listen("airdash", self, "reduce_air_jumps")
-		character.listen("firedash", self, "reduce_air_jumps")
 
 func _Setup():
 	interrupt_if_needed()
 	reduce_air_jumps(1)
-	reduce_airdash_count(1)
 	jump_particle.emit(1)
 	if character.get_action_pressed("dash"):
 		horizontal_velocity = dash_momentum
@@ -33,9 +29,6 @@ func reset_jump_count(_dummy: = null):
 
 func reduce_air_jumps(amount: = 1):
 	current_air_jumps -= amount
-	
-func reduce_airdash_count(amount: = 1) -> void :
-	airdash.airdash_count -= amount
 	
 func emit_dashjump() -> void :
 	pass

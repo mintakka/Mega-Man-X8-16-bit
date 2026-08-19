@@ -56,5 +56,5 @@ func hide_menu() -> void :
 		bg.set_visible(false)
 
 func finish() -> void :
-	emit_signal("finished")
 	transitioning = false
+	emit_signal("finished")

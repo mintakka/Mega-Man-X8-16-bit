@@ -1,7 +1,6 @@
 extends Dash
 class_name AirDash
 
-onready var airjump: = character.get_node("AirJump")
 onready var wall_jump: Node2D = $"../WallJump"
 onready var dash_wall_jump: Node2D = $"../DashWallJump"
 onready var air_jump: Node2D = $"../AirJump"
@@ -31,9 +30,6 @@ func _Setup() -> void :
 	Event.emit_signal("airdash")
 	character.airdash_signal()
 	$label.text = str(airdash_count)
-
-func reduce_air_jumps(amount: = 1) -> void :
-	airjump.reduce_air_jumps(amount)
 
 func reset_airdash_count() -> void :
 	airdash_count = max_airdashes
@@ -76,11 +72,7 @@ func emit_particles(_particles, _value: = false):
 func _ResetCondition() -> bool:
 	if has_let_go_of_input and Input.is_action_just_pressed(actions[0]):
 		if character.get_vertical_speed() > 0:
-			if airjump.active and airjump.current_air_jumps > 0 and airdash_count > 0:
-				airjump.reduce_air_jumps()
-				return true
-			elif infinite_airdashes and airdash_count > 0:
-				return true
+			return airdash_count > 0
 	return false
 
 func _StartCondition() -> bool:
@@ -105,9 +97,6 @@ func is_executing_WallJump() -> bool:
 
 func is_executing_DashJump() -> bool:
 	return character.dashjumps_since_jump > 0
-
-func is_able_to_airjump() -> bool:
-	return airjump.active and airjump.current_air_jumps > 0
 
 func _Interrupt():
 	last_time_pressed = 0.0

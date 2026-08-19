@@ -2,7 +2,7 @@ extends Camera2D
 class_name StateCamera
 
 const width := 398
-onready var coll: CollisionShape2D = $area_limit_detector/collisionShape2D
+onready var area_detector: Area2D = $area_limit_detector
 
 var modes = []
 var current_mode_x
@@ -46,11 +46,17 @@ var areas = []
 
 func _ready() -> void:
 	GameManager.camera = self
+	# The detector tracks the player, not the camera. Keeping it in the camera's
+	# transform hierarchy let render/physics ordering drag it away between ticks;
+	# that was reproducible in the Linux build when entering Zashiko's vertical
+	# side areas. A top-level Area2D has one stable world-space transform.
+	area_detector.set_as_toplevel(true)
 	connect_events()
-	
-	#if GlobalVariables.get("ShowDebug"):
-		#debugt.visible = true
+	call_deferred("set_gamemanager_camera")
 	call_deferred("go_to_player")
+
+func set_gamemanager_camera() -> void:
+	GameManager.camera = self
 
 func connect_events() -> void:
 	Event.listen("screenshake",self,"add_trauma")
@@ -236,7 +242,7 @@ func is_door_translating() -> bool:
 	return false
 
 func adjust_collisor_position () -> void:
-	coll.global_position = GameManager.get_player_position()
+	area_detector.global_position = GameManager.get_player_position()
 
 func set_mode(mode_name : String, target) -> void:
 	var mode = get_node(mode_name)

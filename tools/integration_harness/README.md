@@ -11,6 +11,8 @@ godot3.5 --path . --no-window tools/integration_harness/CampaignResourceMatrixTe
 godot3.5 --path . --no-window tools/integration_harness/HybridZeroSpriteTest.tscn
 godot3.5 --path . --no-window tools/integration_harness/MissionCharacterPickerTest.tscn
 godot3.5 --path . --no-window tools/integration_harness/ZeroGuardTuningTest.tscn
+godot3.5 --path . --no-window tools/integration_harness/CheatMenuReentryTest.tscn
+godot3.5 --path . --no-window tools/integration_harness/NoahsParkCameraTest.tscn
 ```
 
 `BuildHybridZeroFrames.gd` regenerates the base-Zero hybrid SpriteFrames from
@@ -20,3 +22,7 @@ Run it as `BuildHybridZeroFrames.tscn` after changing the source definitions.
 `ZeroGuardTuningTest.tscn` protects Zero's innate knockback resistance and
 confirms his standard ground, jumping, and wall saber attacks stagger a hiding
 Metool before defeating it once exposed.
+
+`CheatMenuReentryTest.tscn` covers repeated code-menu visits from the title,
+Pause, and a returned title scene. `NoahsParkCameraTest.tscn` protects the
+world-space camera detector used by Zashiko's upper K-Knuckle route.
