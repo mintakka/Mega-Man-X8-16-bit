@@ -5,7 +5,7 @@ const HYBRID_PATH := "res://Zero_mod/X8/Sprites/Custom/zerox8_hybrid.tres"
 const USER_TEXTURE_PATH := "res://Zero_mod/X8/Sprites/Custom/zero_mmxnext.png"
 
 const USER_ANIMATIONS := [
-	"idle", "walk", "walk_start", "jump", "fall", "dash", "slide",
+	"idle", "walk", "walk_start", "jump", "fall", "dash",
 	"walljump", "damage", "damage_resist", "recover", "weak", "saber_1",
 	"saber_2", "saber_3", "saber_dash", "saber_jump", "saber_land",
 	"saber_slide"
@@ -38,7 +38,7 @@ func run() -> void:
 		for frame in hybrid.get_frame_count(animation):
 			check(is_user_frame(hybrid.get_frame(animation, frame)), animation + " contains a non-user frame")
 
-	for animation in ["beam", "double_jump", "enkoujin", "ride", "talk", "victory", "youdantotsu"]:
+	for animation in ["beam", "double_jump", "enkoujin", "ride", "slide", "talk", "victory", "youdantotsu"]:
 		for frame in hybrid.get_frame_count(animation):
 			var texture = hybrid.get_frame(animation, frame)
 			if texture != null:

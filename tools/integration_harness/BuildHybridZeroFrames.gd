@@ -16,7 +16,6 @@ const USER_ANIMATIONS := {
 	"jump": "jump",
 	"fall": "fall",
 	"dash": "dash",
-	"slide": "slide",
 	"walljump": "walljump",
 	"damage": "damage",
 	"damage_resist": "damage_resist",
