@@ -1,10 +1,14 @@
 extends Area2D
-export var active := true
+class_name FlamableBarrierProjectileDetector
 
-export var projectile_name := "FireDash"
+export  var active: = true
+
+export var projectiles = ["FireDash", "FlameBurner", "Enkoujin"]
+
 signal projectile_detected
 
-func _on_area2D_body_entered(body: Node) -> void:
+func _on_area2D_body_entered(body: Node) -> void :
 	if active:
-		if projectile_name in body.name:
-			emit_signal("projectile_detected")
+		for word in projectiles:
+			if word in body.name:
+				emit_signal("projectile_detected")

@@ -1,32 +1,28 @@
-extends "res://src/Actors/Props/RideArmor/RepeatAnimation.gd"
+extends AnimatedMirror
+
+onready var reference_frames: Resource = preload("res://src/Actors/Props/RideArmor/pilot_sprites/ra_x.res")
+onready var x_ride: Texture = preload("res://src/Actors/Props/RideArmor/pilot_sprites/ra_x.png")
+onready var x_ultimate_ride: Texture = preload("res://X_mod/UltimateX/Sprites/ra_x_ultimate.png")
+onready var zero_ride: Texture = preload("res://Zero_mod/X8/Sprites/Ride/ride_zero.png")
+onready var axl_ride: Texture = preload("res://Axl_mod/Ride/ride_axl.png")
 
 
-func _ready() -> void:
+func set_player_sprite_sheet():
+	var _texture = x_ride
+	match CharacterManager.player_character:
+		"Player":
+			_texture = x_ride
+		"X":
+			_texture = x_ride
+			if CharacterManager.ultimate_x_armor:
+				_texture = x_ultimate_ride
+		"Zero":
+			
+			_texture = zero_ride
+		"Axl":
+			_texture = axl_ride
+	self.frames = CharacterManager.update_texture_with_new_size(_texture, reference_frames)
+
+func _ready() -> void :
+	set_player_sprite_sheet()
 	material = GameManager.player.animatedSprite.material
-	#This sprite is X unless the rider has their own cockpit art. It mirrors the
-	#mech's animation name and frame index, so a replacement has to carry the
-	#same animation names and frame counts.
-	var pilot_path := CharacterRoster.get_pilot_frames(GameManager.active_character)
-	if pilot_path != "" and ResourceLoader.exists(pilot_path):
-		frames = load(pilot_path)
-		custom_pilot = true
-
-#X's cockpit art is blank while the mech sits empty, so his pilot could simply
-#be drawn at all times. A replacement built from a single pose has no blank
-#frame, which left the rider painted above an unoccupied mech, so an empty
-#cockpit has to hide the sprite outright.
-var custom_pilot := false
-var hidden_by_death := false
-
-const EMPTY_COCKPIT := ["deactivated", "deactivate"]
-
-#The mech hides its pilot on death through this, so that has to outrank the
-#cockpit check or the rider would reappear on a wreck.
-func hide() -> void:
-	hidden_by_death = true
-	.hide()
-
-func _process(delta : float) -> void:
-	._process(delta)
-	if custom_pilot and not hidden_by_death:
-		visible = not (main.animation in EMPTY_COCKPIT)

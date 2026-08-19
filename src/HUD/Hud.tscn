@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=2]
+[gd_scene load_steps=28 format=2]
 
 [ext_resource path="res://src/Levels/HUD.gd" type="Script" id=1]
 [ext_resource path="res://src/HUD/BossBar.gd" type="Script" id=2]
@@ -22,7 +22,8 @@
 [ext_resource path="res://src/HUD/RidearmorBar.gd" type="Script" id=20]
 [ext_resource path="res://src/HUD/R2_bar.png" type="Texture" id=21]
 [ext_resource path="res://src/Effects/Materials/crt_shader_1.tres" type="Material" id=22]
-[ext_resource path="res://src/HUD/CheatMenu.tscn" type="PackedScene" id=23]
+[ext_resource path="res://System/IGT/HUD/InGame_Timer.tscn" type="PackedScene" id=23]
+[ext_resource path="res://src/HUD/CheatMenu.tscn" type="PackedScene" id=24]
 
 [sub_resource type="ShaderMaterial" id=1]
 resource_local_to_scene = true
@@ -52,6 +53,8 @@ checked_inputs = [ "move_left", "move_right", "fire", "alt_fire", "jump", "dash"
 [node name="Pause" parent="." instance=ExtResource( 13 )]
 layer = 4
 visible = false
+
+[node name="CheatMenu" parent="." instance=ExtResource( 24 )]
 
 [node name="WhiteScreen" type="ColorRect" parent="."]
 visible = false
@@ -318,7 +321,7 @@ layer = 128
 margin_left = 397.0
 margin_right = 397.0
 
-[node name="CheatMenu" parent="Boss and Weapon Info/canvasLayer" instance=ExtResource( 23 )]
+[node name="IGTHUD" parent="." instance=ExtResource( 23 )]
 
 [connection signal="displayed" from="X Bar/WeaponBar" to="X Bar/SpecialBar" method="_on_WeaponBar_displayed"]
 [connection signal="hidden" from="X Bar/WeaponBar" to="X Bar/SpecialBar" method="_on_WeaponBar_hidden"]

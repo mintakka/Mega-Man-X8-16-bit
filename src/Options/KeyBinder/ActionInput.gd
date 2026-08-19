@@ -2,23 +2,30 @@ extends LightGroup
 
 onready var action_name: Label = $actionname
 onready var key: = $key
-onready var joypad := $joypad
+onready var joypad: = $joypad
 var action
+var _readname
 
-func setup(_action, readname, menu) -> void:
+func setup(_action, readname, menu) -> void :
 	key.connect_lock_signals(menu)
 	joypad.connect_lock_signals(menu)
 	action = _action
+	_readname = readname
 	action_name.text = tr(readname)
-	var _s = key.connect("updated_event",self,"get_inputs_and_set_names")
-	_s = joypad.connect("updated_event",self,"get_inputs_and_set_names")
+	var _s = key.connect("updated_event", self, "get_inputs_and_set_names")
+	_s = joypad.connect("updated_event", self, "get_inputs_and_set_names")
+	Event.connect("translation_updated",self,"update_action_name")
 	get_inputs_and_set_names(action)
 
-func get_inputs_and_set_names(_action = action) -> void:
+func update_action_name():
+	action_name.text = tr(_readname)
+
+
+func get_inputs_and_set_names(_action = action) -> void :
 	var inputs = InputMap.get_action_list(_action)
 	for button in inputs:
-		var named_keyboard := false
-		var named_joypad := false
+		var named_keyboard: = false
+		var named_joypad: = false
 		if button is InputEventJoypadButton and not named_joypad:
 			joypad.set_text(Input.get_joy_button_string(button.button_index))
 			joypad.original_event = button
@@ -32,7 +39,7 @@ func get_inputs_and_set_names(_action = action) -> void:
 			key.original_event = button
 			named_keyboard = true
 		elif button is InputEventMouseButton and not named_keyboard:
-			key.set_text ( "Mouse" + str(button.button_index))
+			key.set_text("Mouse" + str(button.button_index))
 			key.original_event = button
 			named_keyboard = true
 	

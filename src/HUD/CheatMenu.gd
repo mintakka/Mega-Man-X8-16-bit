@@ -113,6 +113,8 @@ func move_selection(step : int) -> void:
 	refresh()
 
 func activate(index : int, direction := 1) -> void:
+	if not is_row_available(index):
+		return
 	if index < first_armor_row:
 		match index:
 			0: GameManager.set_cheat_god_mode(not GameManager.cheat_god_mode)
@@ -134,9 +136,26 @@ func refresh() -> void:
 		name_label.text = ("> " if is_selected else "  ") + row_labels[i]
 		name_label.add_color_override("font_color", color_title if is_selected else color_idle)
 		if i < first_armor_row:
-			display_toggle(value_label, get_toggle_value(i))
+			if is_row_available(i):
+				display_toggle(value_label, get_toggle_value(i))
+			else:
+				display_unavailable(value_label)
 		else:
-			display_armor(value_label, GameManager.cheat_armor[GameManager.armor_slots[i - first_armor_row]])
+			if is_row_available(i):
+				display_armor(value_label, GameManager.cheat_armor[GameManager.armor_slots[i - first_armor_row]])
+			else:
+				display_unavailable(value_label)
+
+func is_row_available(index: int) -> bool:
+	if index == 1:
+		return CharacterManager.player_character != "Zero"
+	if index == 4 or index >= first_armor_row:
+		return CharacterManager.player_character == "X"
+	return true
+
+func display_unavailable(label: Label) -> void:
+	label.text = "N/A"
+	label.add_color_override("font_color", color_off)
 
 func get_toggle_value(index : int) -> bool:
 	match index:
