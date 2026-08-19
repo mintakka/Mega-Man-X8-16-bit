@@ -3,6 +3,7 @@ extends Node
 const NATIVE_PATH := "res://Zero_mod/X8/Sprites/zerox8.tres"
 const HYBRID_PATH := "res://Zero_mod/X8/Sprites/Custom/zerox8_hybrid.tres"
 const USER_TEXTURE_PATH := "res://Zero_mod/X8/Sprites/Custom/zero_mmxnext.png"
+const DASH_SPEED := 30.0
 
 const USER_ANIMATIONS := [
 	"idle", "walk", "walk_start", "jump", "fall", "dash",
@@ -31,7 +32,8 @@ func run() -> void:
 	for animation in native.get_animation_names():
 		check(hybrid.has_animation(animation), "Hybrid is missing animation " + animation)
 		check(hybrid.get_frame_count(animation) == native.get_frame_count(animation), animation + " frame count changed")
-		check(hybrid.get_animation_speed(animation) == native.get_animation_speed(animation), animation + " speed changed")
+		var expected_speed := DASH_SPEED if animation == "dash" else native.get_animation_speed(animation)
+		check(hybrid.get_animation_speed(animation) == expected_speed, animation + " speed changed unexpectedly")
 		check(hybrid.get_animation_loop(animation) == native.get_animation_loop(animation), animation + " loop flag changed")
 
 	for animation in USER_ANIMATIONS:

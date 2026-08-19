@@ -8,6 +8,7 @@ extends Node
 const NATIVE_PATH := "res://Zero_mod/X8/Sprites/zerox8.tres"
 const USER_PATH := "res://tools/integration_harness/zero_mmxnext_source.tres"
 const OUTPUT_PATH := "res://Zero_mod/X8/Sprites/Custom/zerox8_hybrid.tres"
+const DASH_SPEED := 30.0
 
 const USER_ANIMATIONS := {
 	"idle": "idle",
@@ -48,7 +49,8 @@ func build() -> void:
 	for animation in native.get_animation_names():
 		hybrid.add_animation(animation)
 		hybrid.set_animation_loop(animation, native.get_animation_loop(animation))
-		hybrid.set_animation_speed(animation, native.get_animation_speed(animation))
+		var animation_speed := DASH_SPEED if animation == "dash" else native.get_animation_speed(animation)
+		hybrid.set_animation_speed(animation, animation_speed)
 
 		var native_count := native.get_frame_count(animation)
 		if USER_ANIMATIONS.has(animation):

@@ -1468,7 +1468,7 @@ animations = [ {
 "frames": [ SubResource( 595 ), SubResource( 596 ), SubResource( 596 ), SubResource( 596 ), SubResource( 597 ), SubResource( 597 ), SubResource( 598 ), SubResource( 598 ), SubResource( 598 ), SubResource( 599 ), SubResource( 599 ), SubResource( 600 ), SubResource( 600 ), SubResource( 600 ), SubResource( 601 ), SubResource( 601 ) ],
 "loop": false,
 "name": "dash",
-"speed": 23.0
+"speed": 30.0
 }, {
 "frames": [ SubResource( 498 ), SubResource( 499 ), SubResource( 500 ), SubResource( 501 ), SubResource( 502 ), SubResource( 503 ), SubResource( 504 ), SubResource( 505 ), SubResource( 506 ), SubResource( 506 ) ],
 "loop": false,
