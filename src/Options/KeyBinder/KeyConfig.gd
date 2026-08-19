@@ -140,6 +140,7 @@ func start() -> void :
 	if active or fader.transitioning:
 		return
 	GameManager.set_stretch_mode(SceneTree.STRETCH_MODE_2D)
+	raise_above_host_menu()
 	set_visible_elements()
 	emit_signal("initialize")
 	active = true
@@ -154,6 +155,22 @@ func start() -> void :
 	unlock_buttons()
 	emit_signal("start")
 	call_deferred("give_focus")
+
+# An embedded submenu is its own CanvasLayer, so what covers what is decided by
+# the absolute `layer` number, not by nesting. CheatCode sits at layer 5 inside
+# Options, which is layer 2 on the title screen but layer 6 when Options is
+# instanced into Pause - so in-game the code entry drew *underneath* the very
+# options screen it was meant to cover. It still took input, which is why it
+# looked like it "loaded in the background" and never appeared. Track the host
+# menu's layer instead of trusting the authored number.
+func raise_above_host_menu() -> void :
+	var node: Node = get_parent()
+	while node:
+		if node is CanvasLayer:
+			if layer <= node.layer:
+				layer = node.layer + 1
+			return
+		node = node.get_parent()
 
 func give_focus() -> void :
 	focus.silent = true
