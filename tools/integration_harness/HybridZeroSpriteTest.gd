@@ -1,9 +1,11 @@
 extends Node
 
 const NATIVE_PATH := "res://Zero_mod/X8/Sprites/zerox8.tres"
+const CLEAN_NATIVE_PATH := "res://Zero_mod/X8/Sprites/kknuckle/zerox8knuckle.tres"
 const HYBRID_PATH := "res://Zero_mod/X8/Sprites/Custom/zerox8_hybrid.tres"
 const USER_TEXTURE_PATH := "res://Zero_mod/X8/Sprites/Custom/zero_mmxnext.png"
 const DASH_SPEED := 30.0
+const CLEAN_NATIVE_ANIMATIONS := ["double_jump", "slide", "talk"]
 
 const USER_ANIMATIONS := [
 	"idle", "walk", "walk_start", "jump", "fall", "dash",
@@ -23,9 +25,11 @@ func _ready() -> void:
 
 func run() -> void:
 	var native: SpriteFrames = load(NATIVE_PATH)
+	var clean_native: SpriteFrames = load(CLEAN_NATIVE_PATH)
 	var hybrid: SpriteFrames = load(HYBRID_PATH)
-	check(native != null and hybrid != null, "Native or hybrid Zero SpriteFrames failed to load")
-	if native == null or hybrid == null:
+	check(native != null and clean_native != null and hybrid != null,
+		"Native, clean-native or hybrid Zero SpriteFrames failed to load")
+	if native == null or clean_native == null or hybrid == null:
 		finish()
 		return
 
@@ -40,7 +44,12 @@ func run() -> void:
 		for frame in hybrid.get_frame_count(animation):
 			check(is_user_frame(hybrid.get_frame(animation, frame)), animation + " contains a non-user frame")
 
-	for animation in ["beam", "double_jump", "enkoujin", "ride", "slide", "talk", "victory", "youdantotsu"]:
+	for animation in CLEAN_NATIVE_ANIMATIONS:
+		for frame in hybrid.get_frame_count(animation):
+			check(frames_match(hybrid.get_frame(animation, frame), clean_native.get_frame(animation, frame)),
+				animation + " does not use Zashiko's aligned no-blade frame " + str(frame))
+
+	for animation in ["beam", "enkoujin", "ride", "victory", "youdantotsu"]:
 		for frame in hybrid.get_frame_count(animation):
 			var texture = hybrid.get_frame(animation, frame)
 			if texture != null:
@@ -79,6 +88,11 @@ func run() -> void:
 
 func is_user_frame(texture) -> bool:
 	return texture is AtlasTexture and texture.atlas != null and texture.atlas.resource_path == USER_TEXTURE_PATH
+
+func frames_match(first, second) -> bool:
+	return first is AtlasTexture and second is AtlasTexture \
+		and first.atlas.resource_path == second.atlas.resource_path \
+		and first.region == second.region and first.margin == second.margin
 
 func finish() -> void:
 	if failures.empty():

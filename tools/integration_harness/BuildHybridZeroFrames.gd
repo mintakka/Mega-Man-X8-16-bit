@@ -6,9 +6,14 @@ extends Node
 # Everything not listed here remains byte-for-byte sourced from Zashiko.
 
 const NATIVE_PATH := "res://Zero_mod/X8/Sprites/zerox8.tres"
+const CLEAN_NATIVE_PATH := "res://Zero_mod/X8/Sprites/kknuckle/zerox8knuckle.tres"
 const USER_PATH := "res://tools/integration_harness/zero_mmxnext_source.tres"
 const OUTPUT_PATH := "res://Zero_mod/X8/Sprites/Custom/zerox8_hybrid.tres"
 const DASH_SPEED := 30.0
+
+# These native K-Knuckle frames are the same aligned Zashiko poses without the
+# permanently lit saber. Base Zero still uses saber art for actual attacks.
+const CLEAN_NATIVE_ANIMATIONS := ["double_jump", "slide", "talk"]
 
 const USER_ANIMATIONS := {
 	"idle": "idle",
@@ -36,9 +41,10 @@ func _ready() -> void:
 
 func build() -> void:
 	var native: SpriteFrames = load(NATIVE_PATH)
+	var clean_native: SpriteFrames = load(CLEAN_NATIVE_PATH)
 	var user: SpriteFrames = load(USER_PATH)
-	if native == null or user == null:
-		printerr("Unable to load native or user Zero SpriteFrames")
+	if native == null or clean_native == null or user == null:
+		printerr("Unable to load native, clean-native or user Zero SpriteFrames")
 		get_tree().quit(1)
 		return
 
@@ -60,6 +66,14 @@ func build() -> void:
 				get_tree().quit(1)
 				return
 			copy_resampled_frames(user, user_animation, hybrid, animation, native_count)
+		elif animation in CLEAN_NATIVE_ANIMATIONS:
+			if not clean_native.has_animation(animation) \
+					or clean_native.get_frame_count(animation) != native_count:
+				printerr("Clean native animation contract mismatch: ", animation)
+				get_tree().quit(1)
+				return
+			for frame in native_count:
+				hybrid.add_frame(animation, clean_native.get_frame(animation, frame))
 		else:
 			for frame in native_count:
 				hybrid.add_frame(animation, native.get_frame(animation, frame))

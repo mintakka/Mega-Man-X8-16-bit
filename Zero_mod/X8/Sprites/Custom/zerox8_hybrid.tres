@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" load_steps=341 format=2]
+[gd_resource type="SpriteFrames" load_steps=338 format=2]
 
 [ext_resource path="res://Zero_mod/Sprites/zero_ride_chaser.png" type="Texture" id=1]
 [ext_resource path="res://Zero_mod/X8/Sprites/BossAbilities/Youdantotsu.png" type="Texture" id=2]
@@ -7,13 +7,13 @@
 [ext_resource path="res://Zero_mod/X8/Sprites/BossAbilities/Tenshouha.png" type="Texture" id=5]
 [ext_resource path="res://Zero_mod/X8/Sprites/BossAbilities/Juuhazan.png" type="Texture" id=6]
 [ext_resource path="res://Zero_mod/X8/Sprites/BossAbilities/Hyouryuushou.png" type="Texture" id=7]
-[ext_resource path="res://Zero_mod/X8/Sprites/Double_Jump.png" type="Texture" id=8]
+[ext_resource path="res://Zero_mod/X8/Sprites/kknuckle/wall_slide_mirror.png" type="Texture" id=8]
 [ext_resource path="res://Zero_mod/X8/Sprites/Intro.png" type="Texture" id=9]
 [ext_resource path="res://Zero_mod/X8/Sprites/BossAbilities/Enkoujin.png" type="Texture" id=10]
 [ext_resource path="res://Zero_mod/X8/Sprites/Victory.png" type="Texture" id=11]
-[ext_resource path="res://Zero_mod/X8/Sprites/talk.png" type="Texture" id=12]
+[ext_resource path="res://Zero_mod/X8/Sprites/kknuckle/Double_Jump.png" type="Texture" id=12]
 [ext_resource path="res://Zero_mod/X8/Sprites/Custom/zero_mmxnext.png" type="Texture" id=13]
-[ext_resource path="res://Zero_mod/X8/Sprites/wall_slide_mirror.png" type="Texture" id=14]
+[ext_resource path="res://Zero_mod/X8/Sprites/kknuckle/talk.png" type="Texture" id=14]
 
 [sub_resource type="AtlasTexture" id=551]
 atlas = ExtResource( 9 )
@@ -163,90 +163,90 @@ region = Rect2( 128, 672, 64, 56 )
 atlas = ExtResource( 1 )
 region = Rect2( 128, 560, 64, 56 )
 
-[sub_resource type="AtlasTexture" id=592]
+[sub_resource type="AtlasTexture" id=669]
 atlas = ExtResource( 13 )
 region = Rect2( 167, 201, 39, 45 )
 margin = Rect2( 109, 45, 223, 83 )
 
-[sub_resource type="AtlasTexture" id=593]
+[sub_resource type="AtlasTexture" id=670]
 atlas = ExtResource( 13 )
 region = Rect2( 1871, 150, 37, 46 )
 margin = Rect2( 111, 41, 225, 82 )
 
-[sub_resource type="AtlasTexture" id=594]
+[sub_resource type="AtlasTexture" id=671]
 atlas = ExtResource( 13 )
 region = Rect2( 65, 93, 47, 56 )
 margin = Rect2( 105, 36, 215, 72 )
 
-[sub_resource type="AtlasTexture" id=595]
+[sub_resource type="AtlasTexture" id=672]
 atlas = ExtResource( 13 )
 region = Rect2( 282, 292, 43, 42 )
 margin = Rect2( 111, 45, 219, 86 )
 
-[sub_resource type="AtlasTexture" id=596]
+[sub_resource type="AtlasTexture" id=673]
 atlas = ExtResource( 13 )
 region = Rect2( 623, 247, 48, 43 )
 margin = Rect2( 106, 45, 214, 85 )
 
-[sub_resource type="AtlasTexture" id=597]
+[sub_resource type="AtlasTexture" id=674]
 atlas = ExtResource( 13 )
 region = Rect2( 1911, 247, 64, 42 )
 margin = Rect2( 90, 45, 198, 86 )
 
-[sub_resource type="AtlasTexture" id=598]
+[sub_resource type="AtlasTexture" id=675]
 atlas = ExtResource( 13 )
 region = Rect2( 1947, 376, 66, 37 )
 margin = Rect2( 98, 52, 196, 91 )
 
-[sub_resource type="AtlasTexture" id=599]
+[sub_resource type="AtlasTexture" id=676]
 atlas = ExtResource( 13 )
 region = Rect2( 124, 416, 58, 36 )
 margin = Rect2( 106, 52, 204, 92 )
 
-[sub_resource type="AtlasTexture" id=600]
+[sub_resource type="AtlasTexture" id=677]
 atlas = ExtResource( 13 )
 region = Rect2( 479, 416, 66, 34 )
 margin = Rect2( 98, 55, 196, 94 )
 
-[sub_resource type="AtlasTexture" id=601]
+[sub_resource type="AtlasTexture" id=678]
 atlas = ExtResource( 13 )
 region = Rect2( 686, 416, 58, 33 )
 margin = Rect2( 106, 55, 204, 95 )
 
-[sub_resource type="AtlasTexture" id=498]
-atlas = ExtResource( 8 )
+[sub_resource type="AtlasTexture" id=636]
+atlas = ExtResource( 12 )
 region = Rect2( 0, 0, 128, 128 )
 
-[sub_resource type="AtlasTexture" id=499]
-atlas = ExtResource( 8 )
+[sub_resource type="AtlasTexture" id=637]
+atlas = ExtResource( 12 )
 region = Rect2( 128, 0, 128, 128 )
 
-[sub_resource type="AtlasTexture" id=500]
-atlas = ExtResource( 8 )
+[sub_resource type="AtlasTexture" id=638]
+atlas = ExtResource( 12 )
 region = Rect2( 256, 0, 128, 128 )
 
-[sub_resource type="AtlasTexture" id=501]
-atlas = ExtResource( 8 )
+[sub_resource type="AtlasTexture" id=639]
+atlas = ExtResource( 12 )
 region = Rect2( 384, 0, 128, 128 )
 
-[sub_resource type="AtlasTexture" id=502]
-atlas = ExtResource( 8 )
+[sub_resource type="AtlasTexture" id=640]
+atlas = ExtResource( 12 )
 region = Rect2( 512, 0, 128, 128 )
 
-[sub_resource type="AtlasTexture" id=503]
-atlas = ExtResource( 8 )
+[sub_resource type="AtlasTexture" id=641]
+atlas = ExtResource( 12 )
 region = Rect2( 640, 0, 128, 128 )
 
-[sub_resource type="AtlasTexture" id=504]
-atlas = ExtResource( 8 )
+[sub_resource type="AtlasTexture" id=642]
+atlas = ExtResource( 12 )
 region = Rect2( 768, 0, 128, 128 )
 
-[sub_resource type="AtlasTexture" id=505]
-atlas = ExtResource( 8 )
+[sub_resource type="AtlasTexture" id=643]
+atlas = ExtResource( 12 )
 region = Rect2( 896, 0, 128, 128 )
 
-[sub_resource type="AtlasTexture" id=506]
-atlas = ExtResource( 8 )
+[sub_resource type="AtlasTexture" id=564]
+atlas = ExtResource( 12 )
 region = Rect2( 1024, 0, 128, 128 )
 
 [sub_resource type="AtlasTexture" id=105]
@@ -781,87 +781,87 @@ atlas = ExtResource( 13 )
 region = Rect2( 1604, 376, 42, 38 )
 margin = Rect2( 112, 48, 220, 90 )
 
-[sub_resource type="AtlasTexture" id=602]
+[sub_resource type="AtlasTexture" id=679]
 atlas = ExtResource( 13 )
 region = Rect2( 336, 416, 51, 35 )
 margin = Rect2( 114, 53, 211, 93 )
 
-[sub_resource type="AtlasTexture" id=603]
+[sub_resource type="AtlasTexture" id=680]
 atlas = ExtResource( 13 )
 region = Rect2( 546, 416, 51, 34 )
 margin = Rect2( 114, 54, 211, 94 )
 
-[sub_resource type="AtlasTexture" id=604]
+[sub_resource type="AtlasTexture" id=681]
 atlas = ExtResource( 13 )
 region = Rect2( 44, 416, 79, 36 )
 margin = Rect2( 114, 53, 183, 92 )
 
-[sub_resource type="AtlasTexture" id=605]
+[sub_resource type="AtlasTexture" id=682]
 atlas = ExtResource( 13 )
 region = Rect2( 1766, 376, 93, 37 )
 margin = Rect2( 114, 51, 169, 91 )
 
-[sub_resource type="AtlasTexture" id=606]
+[sub_resource type="AtlasTexture" id=683]
 atlas = ExtResource( 13 )
 region = Rect2( 1860, 376, 86, 37 )
 margin = Rect2( 114, 50, 176, 91 )
 
-[sub_resource type="AtlasTexture" id=607]
+[sub_resource type="AtlasTexture" id=684]
 atlas = ExtResource( 13 )
 region = Rect2( 1976, 247, 57, 42 )
 margin = Rect2( 113, 45, 205, 86 )
 
-[sub_resource type="AtlasTexture" id=608]
+[sub_resource type="AtlasTexture" id=685]
 atlas = ExtResource( 13 )
 region = Rect2( 0, 292, 50, 42 )
 margin = Rect2( 101, 45, 212, 86 )
 
-[sub_resource type="AtlasTexture" id=609]
+[sub_resource type="AtlasTexture" id=686]
 atlas = ExtResource( 13 )
 region = Rect2( 721, 201, 45, 44 )
 margin = Rect2( 105, 42, 217, 84 )
 
-[sub_resource type="AtlasTexture" id=610]
+[sub_resource type="AtlasTexture" id=687]
 atlas = ExtResource( 13 )
 region = Rect2( 859, 201, 44, 44 )
 margin = Rect2( 105, 42, 218, 84 )
 
-[sub_resource type="AtlasTexture" id=611]
+[sub_resource type="AtlasTexture" id=688]
 atlas = ExtResource( 13 )
 region = Rect2( 1033, 201, 42, 44 )
 margin = Rect2( 107, 42, 220, 84 )
 
-[sub_resource type="AtlasTexture" id=612]
+[sub_resource type="AtlasTexture" id=689]
 atlas = ExtResource( 13 )
 region = Rect2( 1556, 93, 40, 51 )
 margin = Rect2( 111, 41, 222, 77 )
 
-[sub_resource type="AtlasTexture" id=613]
+[sub_resource type="AtlasTexture" id=690]
 atlas = ExtResource( 13 )
 region = Rect2( 1952, 93, 58, 50 )
 margin = Rect2( 109, 40, 204, 78 )
 
-[sub_resource type="AtlasTexture" id=614]
+[sub_resource type="AtlasTexture" id=691]
 atlas = ExtResource( 13 )
 region = Rect2( 1882, 93, 69, 50 )
 margin = Rect2( 108, 41, 193, 78 )
 
-[sub_resource type="AtlasTexture" id=615]
+[sub_resource type="AtlasTexture" id=692]
 atlas = ExtResource( 13 )
 region = Rect2( 113, 93, 82, 55 )
 margin = Rect2( 106, 35, 180, 73 )
 
-[sub_resource type="AtlasTexture" id=616]
+[sub_resource type="AtlasTexture" id=693]
 atlas = ExtResource( 13 )
 region = Rect2( 1671, 0, 49, 62 )
 margin = Rect2( 104, 28, 213, 66 )
 
-[sub_resource type="AtlasTexture" id=617]
+[sub_resource type="AtlasTexture" id=694]
 atlas = ExtResource( 13 )
 region = Rect2( 1584, 0, 47, 63 )
 margin = Rect2( 106, 27, 215, 65 )
 
-[sub_resource type="AtlasTexture" id=618]
+[sub_resource type="AtlasTexture" id=695]
 atlas = ExtResource( 13 )
 region = Rect2( 1632, 0, 38, 63 )
 margin = Rect2( 113, 28, 224, 65 )
@@ -936,24 +936,12 @@ atlas = ExtResource( 13 )
 region = Rect2( 869, 150, 35, 49 )
 margin = Rect2( 110, 41, 227, 79 )
 
-[sub_resource type="AtlasTexture" id=324]
-atlas = ExtResource( 14 )
+[sub_resource type="AtlasTexture" id=569]
+atlas = ExtResource( 8 )
 region = Rect2( 128, 0, 128, 128 )
 
-[sub_resource type="AtlasTexture" id=325]
-atlas = ExtResource( 14 )
-region = Rect2( 128, 0, 128, 128 )
-
-[sub_resource type="AtlasTexture" id=326]
-atlas = ExtResource( 14 )
-region = Rect2( 256, 0, 128, 128 )
-
-[sub_resource type="AtlasTexture" id=327]
-atlas = ExtResource( 14 )
-region = Rect2( 256, 0, 128, 128 )
-
-[sub_resource type="AtlasTexture" id=328]
-atlas = ExtResource( 14 )
+[sub_resource type="AtlasTexture" id=570]
+atlas = ExtResource( 8 )
 region = Rect2( 256, 0, 128, 128 )
 
 [sub_resource type="AtlasTexture" id=329]
@@ -1024,12 +1012,12 @@ region = Rect2( 192, 560, 64, 56 )
 atlas = ExtResource( 1 )
 region = Rect2( 128, 560, 64, 56 )
 
-[sub_resource type="AtlasTexture" id=590]
-atlas = ExtResource( 12 )
+[sub_resource type="AtlasTexture" id=667]
+atlas = ExtResource( 14 )
 region = Rect2( 0, 0, 128, 128 )
 
-[sub_resource type="AtlasTexture" id=591]
-atlas = ExtResource( 12 )
+[sub_resource type="AtlasTexture" id=668]
+atlas = ExtResource( 14 )
 region = Rect2( 128, 0, 128, 128 )
 
 [sub_resource type="AtlasTexture" id=353]
@@ -1140,7 +1128,7 @@ region = Rect2( 384, 672, 64, 56 )
 atlas = ExtResource( 1 )
 region = Rect2( 448, 672, 64, 56 )
 
-[sub_resource type="AtlasTexture" id=564]
+[sub_resource type="AtlasTexture" id=696]
 atlas = ExtResource( 11 )
 region = Rect2( 0, 0, 128, 128 )
 
@@ -1160,11 +1148,11 @@ region = Rect2( 384, 0, 128, 128 )
 atlas = ExtResource( 11 )
 region = Rect2( 512, 0, 128, 128 )
 
-[sub_resource type="AtlasTexture" id=569]
+[sub_resource type="AtlasTexture" id=697]
 atlas = ExtResource( 11 )
 region = Rect2( 640, 0, 128, 128 )
 
-[sub_resource type="AtlasTexture" id=570]
+[sub_resource type="AtlasTexture" id=698]
 atlas = ExtResource( 11 )
 region = Rect2( 768, 0, 128, 128 )
 
@@ -1229,12 +1217,12 @@ atlas = ExtResource( 13 )
 region = Rect2( 675, 201, 45, 44 )
 margin = Rect2( 105, 42, 217, 84 )
 
-[sub_resource type="AtlasTexture" id=619]
+[sub_resource type="AtlasTexture" id=699]
 atlas = ExtResource( 13 )
 region = Rect2( 1515, 93, 40, 51 )
 margin = Rect2( 111, 43, 222, 77 )
 
-[sub_resource type="AtlasTexture" id=620]
+[sub_resource type="AtlasTexture" id=700]
 atlas = ExtResource( 13 )
 region = Rect2( 1635, 93, 37, 51 )
 margin = Rect2( 112, 41, 225, 77 )
@@ -1455,22 +1443,22 @@ animations = [ {
 "name": "break_end",
 "speed": 15.0
 }, {
-"frames": [ SubResource( 592 ), SubResource( 592 ), SubResource( 593 ), SubResource( 593 ), SubResource( 594 ), SubResource( 593 ), SubResource( 594 ), SubResource( 593 ), SubResource( 594 ), SubResource( 593 ), SubResource( 593 ), SubResource( 594 ), SubResource( 593 ), SubResource( 593 ), SubResource( 593 ), SubResource( 593 ), SubResource( 592 ), SubResource( 592 ) ],
+"frames": [ SubResource( 669 ), SubResource( 669 ), SubResource( 670 ), SubResource( 670 ), SubResource( 671 ), SubResource( 670 ), SubResource( 671 ), SubResource( 670 ), SubResource( 671 ), SubResource( 670 ), SubResource( 670 ), SubResource( 671 ), SubResource( 670 ), SubResource( 670 ), SubResource( 670 ), SubResource( 670 ), SubResource( 669 ), SubResource( 669 ) ],
 "loop": true,
 "name": "damage",
 "speed": 31.0
 }, {
-"frames": [ SubResource( 592 ), SubResource( 593 ), SubResource( 593 ), SubResource( 594 ), SubResource( 594 ), SubResource( 593 ), SubResource( 594 ), SubResource( 593 ), SubResource( 594 ), SubResource( 593 ), SubResource( 593 ), SubResource( 593 ), SubResource( 592 ) ],
+"frames": [ SubResource( 669 ), SubResource( 670 ), SubResource( 670 ), SubResource( 671 ), SubResource( 671 ), SubResource( 670 ), SubResource( 671 ), SubResource( 670 ), SubResource( 671 ), SubResource( 670 ), SubResource( 670 ), SubResource( 670 ), SubResource( 669 ) ],
 "loop": false,
 "name": "damage_resist",
 "speed": 31.0
 }, {
-"frames": [ SubResource( 595 ), SubResource( 596 ), SubResource( 596 ), SubResource( 596 ), SubResource( 597 ), SubResource( 597 ), SubResource( 598 ), SubResource( 598 ), SubResource( 598 ), SubResource( 599 ), SubResource( 599 ), SubResource( 600 ), SubResource( 600 ), SubResource( 600 ), SubResource( 601 ), SubResource( 601 ) ],
+"frames": [ SubResource( 672 ), SubResource( 673 ), SubResource( 673 ), SubResource( 673 ), SubResource( 674 ), SubResource( 674 ), SubResource( 675 ), SubResource( 675 ), SubResource( 675 ), SubResource( 676 ), SubResource( 676 ), SubResource( 677 ), SubResource( 677 ), SubResource( 677 ), SubResource( 678 ), SubResource( 678 ) ],
 "loop": false,
 "name": "dash",
 "speed": 30.0
 }, {
-"frames": [ SubResource( 498 ), SubResource( 499 ), SubResource( 500 ), SubResource( 501 ), SubResource( 502 ), SubResource( 503 ), SubResource( 504 ), SubResource( 505 ), SubResource( 506 ), SubResource( 506 ) ],
+"frames": [ SubResource( 636 ), SubResource( 637 ), SubResource( 638 ), SubResource( 639 ), SubResource( 640 ), SubResource( 641 ), SubResource( 642 ), SubResource( 643 ), SubResource( 564 ), SubResource( 564 ) ],
 "loop": false,
 "name": "double_jump",
 "speed": 30.0
@@ -1545,12 +1533,12 @@ animations = [ {
 "name": "saber_3",
 "speed": 35.0
 }, {
-"frames": [ SubResource( 602 ), SubResource( 603 ), SubResource( 604 ), SubResource( 605 ), SubResource( 605 ), SubResource( 606 ), SubResource( 606 ), SubResource( 607 ), SubResource( 608 ), SubResource( 609 ), SubResource( 609 ), SubResource( 610 ), SubResource( 611 ) ],
+"frames": [ SubResource( 679 ), SubResource( 680 ), SubResource( 681 ), SubResource( 682 ), SubResource( 682 ), SubResource( 683 ), SubResource( 683 ), SubResource( 684 ), SubResource( 685 ), SubResource( 686 ), SubResource( 686 ), SubResource( 687 ), SubResource( 688 ) ],
 "loop": false,
 "name": "saber_dash",
 "speed": 30.0
 }, {
-"frames": [ SubResource( 612 ), SubResource( 613 ), SubResource( 613 ), SubResource( 614 ), SubResource( 615 ), SubResource( 616 ), SubResource( 616 ), SubResource( 617 ), SubResource( 617 ), SubResource( 618 ) ],
+"frames": [ SubResource( 689 ), SubResource( 690 ), SubResource( 690 ), SubResource( 691 ), SubResource( 692 ), SubResource( 693 ), SubResource( 693 ), SubResource( 694 ), SubResource( 694 ), SubResource( 695 ) ],
 "loop": false,
 "name": "saber_jump",
 "speed": 30.0
@@ -1565,7 +1553,7 @@ animations = [ {
 "name": "saber_slide",
 "speed": 30.0
 }, {
-"frames": [ SubResource( 324 ), SubResource( 325 ), SubResource( 326 ), SubResource( 327 ), SubResource( 328 ) ],
+"frames": [ SubResource( 569 ), SubResource( 569 ), SubResource( 569 ), SubResource( 570 ), SubResource( 570 ) ],
 "loop": false,
 "name": "slide",
 "speed": 15.0
@@ -1580,7 +1568,7 @@ animations = [ {
 "name": "stop_end",
 "speed": 23.0
 }, {
-"frames": [ SubResource( 590 ), SubResource( 591 ) ],
+"frames": [ SubResource( 667 ), SubResource( 668 ) ],
 "loop": true,
 "name": "talk",
 "speed": 10.0
@@ -1595,7 +1583,7 @@ animations = [ {
 "name": "turn",
 "speed": 15.0
 }, {
-"frames": [ SubResource( 564 ), SubResource( 564 ), SubResource( 565 ), SubResource( 566 ), SubResource( 567 ), SubResource( 568 ), SubResource( 569 ), SubResource( 570 ), SubResource( 571 ), SubResource( 572 ), SubResource( 573 ), SubResource( 574 ), SubResource( 570 ), SubResource( 570 ), SubResource( 570 ), SubResource( 570 ), SubResource( 570 ), SubResource( 570 ), SubResource( 570 ), SubResource( 570 ), SubResource( 570 ) ],
+"frames": [ SubResource( 696 ), SubResource( 696 ), SubResource( 565 ), SubResource( 566 ), SubResource( 567 ), SubResource( 568 ), SubResource( 697 ), SubResource( 698 ), SubResource( 571 ), SubResource( 572 ), SubResource( 573 ), SubResource( 574 ), SubResource( 698 ), SubResource( 698 ), SubResource( 698 ), SubResource( 698 ), SubResource( 698 ), SubResource( 698 ), SubResource( 698 ), SubResource( 698 ), SubResource( 698 ) ],
 "loop": false,
 "name": "victory",
 "speed": 23.0
@@ -1610,7 +1598,7 @@ animations = [ {
 "name": "walk_start",
 "speed": 23.0
 }, {
-"frames": [ SubResource( 619 ), SubResource( 619 ), SubResource( 619 ), SubResource( 619 ), SubResource( 619 ), SubResource( 619 ), SubResource( 619 ), SubResource( 619 ), SubResource( 619 ), SubResource( 619 ), SubResource( 619 ), SubResource( 619 ), SubResource( 619 ), SubResource( 619 ), SubResource( 619 ), SubResource( 620 ), SubResource( 620 ), SubResource( 620 ), SubResource( 620 ) ],
+"frames": [ SubResource( 699 ), SubResource( 699 ), SubResource( 699 ), SubResource( 699 ), SubResource( 699 ), SubResource( 699 ), SubResource( 699 ), SubResource( 699 ), SubResource( 699 ), SubResource( 699 ), SubResource( 699 ), SubResource( 699 ), SubResource( 699 ), SubResource( 699 ), SubResource( 699 ), SubResource( 700 ), SubResource( 700 ), SubResource( 700 ), SubResource( 700 ) ],
 "loop": false,
 "name": "walljump",
 "speed": 27.0
