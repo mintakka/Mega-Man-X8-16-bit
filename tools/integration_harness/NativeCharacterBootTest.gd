@@ -32,6 +32,34 @@ func run() -> void:
 			x_airjump.reduce_air_jumps(1)
 			check(x_airdash.airdash_count == 1,
 				"X's Icarus double jump consumed his second air dash")
+
+			# Drive the real double jump instead of poking the counters, once
+			# with dash held and once without. Holding dash is the normal way
+			# to travel, and that path used to still spend an air dash through
+			# dashjump_signal() -> "dashjump" -> AirDash.reduce_airdash_count.
+			# The player must be listening to inputs first: Character.
+			# get_action_pressed returns false while inactive, so the dash
+			# branch under test would never execute on a freshly spawned X.
+			player.activate()
+			yield(get_tree(), "idle_frame")
+			check(player.get_action_pressed("dash") == false,
+				"dash reported pressed before the test pressed it")
+			for dash_held in [false, true]:
+				x_airdash.airdash_count = 2
+				x_airjump.current_air_jumps = 1
+				if dash_held:
+					Input.action_press("dash")
+				else:
+					Input.action_release("dash")
+				yield(get_tree(), "idle_frame")
+				x_airjump._Setup()
+				yield(get_tree(), "idle_frame")
+				var label := "dash held" if dash_held else "dash released"
+				check(x_airdash.airdash_count == 2,
+					"X's double jump (" + label + ") consumed an air dash")
+				check(x_airjump.current_air_jumps == 0,
+					"X's double jump (" + label + ") did not spend the air jump")
+			Input.action_release("dash")
 			player.listening_to_inputs = false
 			check(not player.get_node("Charge")._StartCondition(),
 				"X can start charging while cutscene input is disabled")

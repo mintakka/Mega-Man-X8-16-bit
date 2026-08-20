@@ -49,3 +49,17 @@ button must check `already_finished_noahs_park()` before replaying the intro -
 the character carousel's `GameStart` declared that helper but never called it,
 so picking a character without a queued mission dropped a finished campaign
 back into the intro stage, where the K-Knuckle area does not exist at all.
+
+Two notes from a review pass on these fixes, both now covered:
+
+- `ChargeAfterDialogueTest` also exercises **Ultimate Armor X**. `UltimateX.gd`
+  extends `Character` directly instead of `Player`/`PlayerX`, but keeps its own
+  `block_charging` and shares `Charge.gd`, so patching only the two obvious
+  player scripts left the same permanent no-charge bug on that armor.
+- `NativeCharacterBootTest` drives the real `ExtraDashJump._Setup()` with dash
+  held and released, rather than calling the counters directly. `_Setup()` used
+  to route through `dashjump_signal()`, which `AirDash` maps to
+  `reduce_airdash_count` - so a double jump still ate an air dash whenever dash
+  was held, which is the normal way to move. Note the player must be activated
+  first: `Character.get_action_pressed` returns false while inactive, so the
+  branch under test silently never runs on a freshly spawned player.

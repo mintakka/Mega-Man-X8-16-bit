@@ -44,6 +44,18 @@ func activate():
 		.activate()
 	return
 
+# Cutscenes end through GameManager.resume_character_inputs, which calls
+# start_listening_to_inputs directly and never reaches activate(). Since
+# deactivate() is what sets block_charging, only clearing it in activate() left
+# the buster permanently unable to charge after a conversation. UltimateX
+# extends Character directly rather than Player/PlayerX, so it needs its own
+# copy of this: it has its own block_charging but shares Charge.gd, whose
+# _StartCondition now refuses to start while the flag is set.
+func start_listening_to_inputs() -> void:
+	.start_listening_to_inputs()
+	if listening_to_inputs:
+		reactivate_charge()
+
 func has_control() -> bool:
 	if grabbed:
 		return true

@@ -37,9 +37,17 @@ func give_focus() -> void:
 func _input(event : InputEvent) -> void:
 	if not active or locked:
 		return
-	# Handle this leaf menu's exit directly. Chaining X8Menu._input here left a
-	# second yielded fade callback alive when the same embedded scene was opened
-	# again, which crashes Godot 3.5 during Pause/title scene teardown.
+	# Handle this leaf menu's exit here rather than calling ._input(event).
+	#
+	# Note what does NOT protect us: Godot 3 dispatches _input through the whole
+	# script chain (call_multilevel), so X8Menu._input still runs on this same
+	# event no matter what, and set_input_as_handled() below cannot stop it -
+	# the viewport's handled check happened before either ran. The double fade
+	# is prevented by end() calling lock_buttons() synchronously before it
+	# yields, so the base's `if active and not locked` guard fails when it
+	# fires. Keep that guard (and KeyConfig.end()'s re-entrancy check) intact:
+	# relaxing either one reintroduces a second yielded fade callback on the
+	# same embedded scene, which crashes Godot 3.5 during scene teardown.
 	if event.is_action_pressed(exit_action):
 		cancel_auto_close()
 		end()
