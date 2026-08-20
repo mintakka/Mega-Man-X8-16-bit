@@ -26,7 +26,13 @@ signal unlock_buttons
 
 
 func _input(event: InputEvent) -> void :
-	if active:
+	# Must honour `locked`, the way X8Menu._input does. Confirming a character
+	# calls lock_buttons() and then waits ~0.5s on the fade before the stage
+	# loads; without this guard a cancel arriving inside that window still ran
+	# end() -> cancel_character_select_stage(), dropping the player back at
+	# stage select after they had already picked. That reads as the picker
+	# bouncing back every time you try to enter a stage.
+	if active and not locked:
 		if exit_action != "none" and event.is_action_pressed(exit_action):
 			end()
 

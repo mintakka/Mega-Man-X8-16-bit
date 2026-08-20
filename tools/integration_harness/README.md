@@ -16,6 +16,7 @@ godot3.5 --path . --no-window tools/integration_harness/NoahsParkCameraTest.tscn
 godot3.5 --path . --no-window tools/integration_harness/CheatMenuLayerTest.tscn
 godot3.5 --path . --no-window tools/integration_harness/ChargeAfterDialogueTest.tscn
 godot3.5 --path . --no-window tools/integration_harness/StageRoutingTest.tscn
+godot3.5 --path . --no-window tools/integration_harness/PickerCancelRaceTest.tscn
 ```
 
 `BuildHybridZeroFrames.gd` regenerates the base-Zero hybrid SpriteFrames from
@@ -63,3 +64,14 @@ Two notes from a review pass on these fixes, both now covered:
   was held, which is the normal way to move. Note the player must be activated
   first: `Character.get_action_pressed` returns false while inactive, so the
   branch under test silently never runs on a freshly spawned player.
+
+`PickerCancelRaceTest.tscn` covers the character carousel bouncing straight
+back to stage select after you had already chosen. `GameStart.on_press()`
+locks the menu and then yields ~0.5s on the fade before the stage loads, but
+`Character_Selection._input` checked `active` without `locked`, so a cancel
+inside that window still ran `end()` -> `cancel_character_select_stage()`.
+Note **`ui_cancel` and `dash` share both bindings** in `project.godot` (key 65
+/ joypad button 1), so a reflexive dash tap during the fade is enough - this
+is a routine input, not an exotic one. Its driver runs under `root` because
+the failing path calls `change_scene()`, which would free a test node that is
+itself the current scene.
