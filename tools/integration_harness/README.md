@@ -15,6 +15,7 @@ godot3.5 --path . --no-window tools/integration_harness/CheatMenuReentryTest.tsc
 godot3.5 --path . --no-window tools/integration_harness/NoahsParkCameraTest.tscn
 godot3.5 --path . --no-window tools/integration_harness/CheatMenuLayerTest.tscn
 godot3.5 --path . --no-window tools/integration_harness/ChargeAfterDialogueTest.tscn
+godot3.5 --path . --no-window tools/integration_harness/StageRoutingTest.tscn
 ```
 
 `BuildHybridZeroFrames.gd` regenerates the base-Zero hybrid SpriteFrames from
@@ -39,3 +40,12 @@ underneath it, taking input while never appearing.
 conversation. Cutscenes set `block_charging` through `deactivate()` but end
 through `GameManager.resume_character_inputs`, which restores input without
 ever reaching `activate()` - the only place that used to clear the flag.
+
+`StageRoutingTest.tscn` guards the difference between the two Noah's Park
+levels. `NoahsPark` is the one-off intro (`Intro_NoahsPark.tscn`); `NoahsPark2`
+is the replayable stage (`Axl_mod/.../Stage_NoahsPark.tscn`) and is the *only*
+one containing Zero's K-Knuckle pickup and the upper route to it. Every start
+button must check `already_finished_noahs_park()` before replaying the intro -
+the character carousel's `GameStart` declared that helper but never called it,
+so picking a character without a queued mission dropped a finished campaign
+back into the intro stage, where the K-Knuckle area does not exist at all.

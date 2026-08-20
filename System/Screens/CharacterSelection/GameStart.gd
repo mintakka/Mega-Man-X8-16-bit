@@ -31,9 +31,17 @@ func on_press() -> void :
 	GameManager.seen_dialogues.clear()
 	go_to_next_scene()
 
+# "NoahsPark" is the one-off intro stage, not the replayable one. Every other
+# start button checks already_finished_noahs_park() before using it - this one
+# defined the helper but never called it, so any route into the picker without
+# a queued mission replayed the intro no matter how much of the campaign was
+# already done. That also hid Zero's K-Knuckle: it only exists in the
+# replayable NoahsPark2 stage, which is reachable from stage select.
 func go_to_next_scene() -> void :
 	if GameManager.has_pending_character_select_stage():
 		GameManager.start_pending_character_select_stage()
+	elif already_finished_noahs_park():
+		GameManager.call_deferred("go_to_stage_select")
 	else:
 		GameManager.start_level("NoahsPark")
 
