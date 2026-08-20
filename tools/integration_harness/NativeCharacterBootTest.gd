@@ -21,6 +21,20 @@ func run() -> void:
 		check(player.has_control() == false, character + " did not honor the shared inactive spawn contract")
 		if character == "X":
 			check(player.has_node("Charge"), "X's native charge ability is missing")
+			player.equip_icarus_legs_parts()
+			var x_airdash = player.get_node("AirDash")
+			var x_airjump = player.get_node("AirJump")
+			x_airdash.airdash_count = 2
+			x_airjump.current_air_jumps = 1
+			x_airdash.reduce_airdash_count(1)
+			check(x_airjump.current_air_jumps == 1,
+				"X's air dash consumed his Icarus double jump")
+			x_airjump.reduce_air_jumps(1)
+			check(x_airdash.airdash_count == 1,
+				"X's Icarus double jump consumed his second air dash")
+			player.listening_to_inputs = false
+			check(not player.get_node("Charge")._StartCondition(),
+				"X can start charging while cutscene input is disabled")
 		elif character == "Zero":
 			check(not player.has_node("Charge"), "Zero inherited an X charge-buster mechanic")
 			check(player.get_node("AirDash").max_airdashes == 2, "Zero runtime air-dash count is not two")

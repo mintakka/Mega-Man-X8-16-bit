@@ -13,8 +13,6 @@ func start():
 	if not GameManager.was_dialogue_seen(dialogue):
 		if GameManager.player:
 			GameManager.player.deactivate()
-			if GameManager.player.name == "X":
-				GameManager.player.reactivate_charge()
 		GameManager.start_dialog(dialogue)
 	else:
 		if not started:
