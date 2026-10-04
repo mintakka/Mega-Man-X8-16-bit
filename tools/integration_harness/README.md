@@ -11,6 +11,12 @@ godot3.5 --path . --no-window tools/integration_harness/CampaignResourceMatrixTe
 godot3.5 --path . --no-window tools/integration_harness/HybridZeroSpriteTest.tscn
 godot3.5 --path . --no-window tools/integration_harness/MissionCharacterPickerTest.tscn
 godot3.5 --path . --no-window tools/integration_harness/ZeroGuardTuningTest.tscn
+godot3.5 --path . --no-window tools/integration_harness/CheatMenuReentryTest.tscn
+godot3.5 --path . --no-window tools/integration_harness/NoahsParkCameraTest.tscn
+godot3.5 --path . --no-window tools/integration_harness/CheatMenuLayerTest.tscn
+godot3.5 --path . --no-window tools/integration_harness/ChargeAfterDialogueTest.tscn
+godot3.5 --path . --no-window tools/integration_harness/StageRoutingTest.tscn
+godot3.5 --path . --no-window tools/integration_harness/PickerCancelRaceTest.tscn
 ```
 
 `BuildHybridZeroFrames.gd` regenerates the base-Zero hybrid SpriteFrames from
@@ -20,3 +26,52 @@ Run it as `BuildHybridZeroFrames.tscn` after changing the source definitions.
 `ZeroGuardTuningTest.tscn` protects Zero's innate knockback resistance and
 confirms his standard ground, jumping, and wall saber attacks stagger a hiding
 Metool before defeating it once exposed.
+
+`CheatMenuReentryTest.tscn` covers repeated code-menu visits from the title,
+Pause, and a returned title scene. `NoahsParkCameraTest.tscn` protects the
+world-space camera detector used by Zashiko's upper K-Knuckle route.
+
+`CheatMenuLayerTest.tscn` checks that the code entry is actually *drawn* over
+the screen that opened it. It is its own CanvasLayer, so occlusion follows the
+absolute `layer` number rather than nesting, and Pause instances Options at a
+higher layer than the title screen does - which used to leave the code entry
+underneath it, taking input while never appearing.
+
+`ChargeAfterDialogueTest.tscn` keeps X's buster chargeable after a cutscene
+conversation. Cutscenes set `block_charging` through `deactivate()` but end
+through `GameManager.resume_character_inputs`, which restores input without
+ever reaching `activate()` - the only place that used to clear the flag.
+
+`StageRoutingTest.tscn` guards the difference between the two Noah's Park
+levels. `NoahsPark` is the one-off intro (`Intro_NoahsPark.tscn`); `NoahsPark2`
+is the replayable stage (`Axl_mod/.../Stage_NoahsPark.tscn`) and is the *only*
+one containing Zero's K-Knuckle pickup and the upper route to it. Every start
+button must check `already_finished_noahs_park()` before replaying the intro -
+the character carousel's `GameStart` declared that helper but never called it,
+so picking a character without a queued mission dropped a finished campaign
+back into the intro stage, where the K-Knuckle area does not exist at all.
+
+Two notes from a review pass on these fixes, both now covered:
+
+- `ChargeAfterDialogueTest` also exercises **Ultimate Armor X**. `UltimateX.gd`
+  extends `Character` directly instead of `Player`/`PlayerX`, but keeps its own
+  `block_charging` and shares `Charge.gd`, so patching only the two obvious
+  player scripts left the same permanent no-charge bug on that armor.
+- `NativeCharacterBootTest` drives the real `ExtraDashJump._Setup()` with dash
+  held and released, rather than calling the counters directly. `_Setup()` used
+  to route through `dashjump_signal()`, which `AirDash` maps to
+  `reduce_airdash_count` - so a double jump still ate an air dash whenever dash
+  was held, which is the normal way to move. Note the player must be activated
+  first: `Character.get_action_pressed` returns false while inactive, so the
+  branch under test silently never runs on a freshly spawned player.
+
+`PickerCancelRaceTest.tscn` covers the character carousel bouncing straight
+back to stage select after you had already chosen. `GameStart.on_press()`
+locks the menu and then yields ~0.5s on the fade before the stage loads, but
+`Character_Selection._input` checked `active` without `locked`, so a cancel
+inside that window still ran `end()` -> `cancel_character_select_stage()`.
+Note **`ui_cancel` and `dash` share both bindings** in `project.godot` (key 65
+/ joypad button 1), so a reflexive dash tap during the fade is enough - this
+is a routine input, not an exotic one. Its driver runs under `root` because
+the failing path calls `change_scene()`, which would free a test node that is
+itself the current scene.

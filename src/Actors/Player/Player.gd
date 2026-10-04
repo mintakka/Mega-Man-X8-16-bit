@@ -39,8 +39,18 @@ func activate():
 	if is_colliding():
 		reactivate_charge()
 		.activate()
-	
+
 	return
+
+# Cutscenes end through GameManager.resume_character_inputs, which calls
+# start_listening_to_inputs directly and never reaches activate(). Since
+# deactivate() is what sets block_charging, only clearing it in activate() left
+# the buster permanently unable to charge after a conversation. Clearing it
+# here keeps it paired with the input flag that actually toggles.
+func start_listening_to_inputs() -> void:
+	.start_listening_to_inputs()
+	if listening_to_inputs:
+		reactivate_charge()
 
 func has_control() -> bool:
 	if grabbed:

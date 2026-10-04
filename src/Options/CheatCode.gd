@@ -20,6 +20,7 @@ onready var status : Label = $Menu/status
 var digits := []
 var cursor := 0
 var entered := false
+var auto_close_timer: Timer
 
 func _ready() -> void:
 	digits.resize(GameManager.cheat_code_length)
@@ -34,8 +35,23 @@ func give_focus() -> void:
 	pass
 
 func _input(event : InputEvent) -> void:
-	._input(event)
 	if not active or locked:
+		return
+	# Handle this leaf menu's exit here rather than calling ._input(event).
+	#
+	# Note what does NOT protect us: Godot 3 dispatches _input through the whole
+	# script chain (call_multilevel), so X8Menu._input still runs on this same
+	# event no matter what, and set_input_as_handled() below cannot stop it -
+	# the viewport's handled check happened before either ran. The double fade
+	# is prevented by end() calling lock_buttons() synchronously before it
+	# yields, so the base's `if active and not locked` guard fails when it
+	# fires. Keep that guard (and KeyConfig.end()'s re-entrancy check) intact:
+	# relaxing either one reintroduces a second yielded fade callback on the
+	# same embedded scene, which crashes Godot 3.5 during scene teardown.
+	if event.is_action_pressed(exit_action):
+		cancel_auto_close()
+		end()
+		get_tree().set_input_as_handled()
 		return
 	if event.is_action_pressed("ui_right"):
 		move_cursor(1)
@@ -72,7 +88,30 @@ func submit() -> void:
 	play_choice_sound()
 	refresh()
 	if accepted:
-		Tools.timer(1.2, "end", self)
+		schedule_auto_close()
+
+func schedule_auto_close() -> void:
+	cancel_auto_close()
+	auto_close_timer = Timer.new()
+	auto_close_timer.one_shot = true
+	auto_close_timer.wait_time = 1.2
+	auto_close_timer.pause_mode = Node.PAUSE_MODE_PROCESS
+	add_child(auto_close_timer)
+	auto_close_timer.connect("timeout", self, "_on_auto_close")
+	auto_close_timer.start()
+
+func cancel_auto_close() -> void:
+	if is_instance_valid(auto_close_timer):
+		auto_close_timer.stop()
+		auto_close_timer.queue_free()
+	auto_close_timer = null
+
+func _on_auto_close() -> void:
+	var finished_timer := auto_close_timer
+	auto_close_timer = null
+	if is_instance_valid(finished_timer):
+		finished_timer.queue_free()
+	end()
 
 func refresh() -> void:
 	for i in digits.size():

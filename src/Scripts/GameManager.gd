@@ -244,6 +244,9 @@ func set_player_lives_to_at_least_2() -> void:
 
 func go_to_intro() -> void:
 	print_debug(":::::::: going to intro")
+	# Returning from the in-game Options screen must not carry PauseMenu into the
+	# new title scene. A paused SceneTree made later submenu visits look frozen.
+	force_unpause()
 	var _dv = get_tree().change_scene("res://src/Title/IntroCapcom.tscn")
 
 func go_to_disclaimer() -> void:

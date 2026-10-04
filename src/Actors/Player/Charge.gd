@@ -96,6 +96,8 @@ func BANDAID_stop_audio_if_not_executing():
 			Log("Forcefully stopped undesired playing sound")
 
 func _StartCondition() -> bool:
+	if not character.listening_to_inputs:
+		return false
 	if not current_weapon:
 		update_current_weapon(arm_cannon.current_weapon)
 	if current_weapon is BossWeapon and not arm_cannon.upgraded:
@@ -107,6 +109,11 @@ func _StartCondition() -> bool:
 	return false
 
 func _Update(_delta: float) -> void :
+	# Dialogue advances with FIRE. Cutscenes stop player input, so charging must
+	# stop as well instead of treating each conversation advance as a new hold.
+	if not character.listening_to_inputs:
+		EndAbility()
+		return
 	if is_fast_charge_buster():
 		if get_charge_released() and character.listening_to_inputs:
 			if charged_time >= level_4_charge * (1 - charge_time_reduction):
